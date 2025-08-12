@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vrchat-mcp"
+version = "0.1.0"
+description = "VRChat MCP for controlling avatars and assets with FastMCP 2.10"
+authors = [
+    {name = "Sandra Schi"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = [
+    "fastmcp>=2.10.0",
+    "python-osc>=1.8.1",
+    "pydantic>=2.0.0",
+    "fastapi>=0.95.0",
+    "uvicorn>=0.21.0",
+    "python-dotenv>=1.0.0",
+    "loguru>=0.7.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+    "types-python-dateutil>=2.8.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[project.scripts]
+vrchat-mcp = "vrchat_mcp.cli:main"
