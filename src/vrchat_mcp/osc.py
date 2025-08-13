@@ -135,12 +135,30 @@ class OSCManager:
         self._register_default_handlers()
     
     def _register_default_handlers(self) -> None:
-        """Register default OSC message handlers."""
-        # Avatar change detection
+        """Register default OSC message handlers for VRChat communication.
+        
+        This method sets up the default message handlers for:
+        - Avatar change notifications
+        - Parameter updates
+        - Avatar parameter changes
+        - Input state changes
+        """
+        logger.debug("Registering default OSC message handlers")
+        
+        # Avatar change detection - triggered when the local or remote avatar changes
         self._dispatcher.map("/avatar/change", self._handle_avatar_change)
         
-        # Parameter updates
-        self._dispatcher.map("/avatar/parameters/*", self._handle_parameter_update)
+        # Parameter updates - handles all avatar parameter changes
+        self._dispatcher.map(
+            "/avatar/parameters/*", 
+            self._handle_parameter_update
+        )
+        
+        # Register a wildcard handler for all avatar-related messages
+        # This allows catching any avatar-related OSC messages that don't have specific handlers
+        self._dispatcher.set_default_handler(self._handle_default_message)
+        
+        logger.debug("Default OSC message handlers registered")
     
     @property
     def state(self) -> ConnectionState:
@@ -725,61 +743,194 @@ class OSCManager:
     def load_avatar(self, avatar_id: str) -> None:
         """Load an avatar by ID.
         
+        This method sends an OSC message to VRChat to change the current avatar.
+        The actual avatar change happens asynchronously in VRChat.
+        
         Args:
-            avatar_id: The ID of the avatar to load
+            avatar_id: The ID of the avatar to load. This should be a valid avatar ID
+                     that exists in the user's VRChat account.
+                     
+        Raises:
+            ValueError: If avatar_id is empty or None
+            RuntimeError: If there's an issue sending the OSC message
         """
-        self.send_message("/avatar/change", avatar_id)
+        if not avatar_id:
+            raise ValueError("Avatar ID cannot be empty or None")
+            
+        logger.info(f"Requesting avatar change to: {avatar_id}")
+        
+        try:
+            # Send the avatar change message
+            self.send_message("/avatar/change", avatar_id)
+            
+            # Update statistics
+            self._connection_stats.messages_sent += 1
+            logger.debug(f"Sent avatar change request for: {avatar_id}")
+            
+        except Exception as e:
+            error_msg = f"Failed to send avatar change request for {avatar_id}: {e}"
+            logger.error(error_msg)
+            raise RuntimeError(error_msg) from e
     
     # === OSC Message Handlers ===
     
     def _handle_avatar_change(self, address: str, *args: Any) -> None:
-        """Handle avatar change notifications."""
+        """Handle avatar change notifications from VRChat.
+        
+        This method is called when VRChat notifies us of an avatar change.
+        It updates the current avatar and notifies any registered handlers.
+        
+        Args:
+            address: The OSC address that triggered this handler
+            *args: The arguments sent with the OSC message. The first argument
+                  should be the avatar ID.
+        """
         if not args or not args[0]:
+            logger.warning("Received empty avatar change notification")
             return
             
+        # Extract the new avatar ID from the arguments
         new_avatar = args[0][0] if isinstance(args[0], (list, tuple)) else args[0]
         
+        # Ensure the avatar ID is a string
         if isinstance(new_avatar, (str, bytes)):
             new_avatar = new_avatar.decode('utf-8') if isinstance(new_avatar, bytes) else new_avatar
             
+            # Only process if the avatar has actually changed
             if new_avatar != self.current_avatar:
-                logger.info(f"Avatar changed to: {new_avatar}")
+                old_avatar = self.current_avatar
                 self.current_avatar = new_avatar
                 
                 # Update statistics
                 self._connection_stats.messages_received += 1
                 
-                # Notify any listeners about the avatar change
+                # Log the avatar change
+                logger.info(f"Avatar changed from '{old_avatar}' to '{new_avatar}'")
+                
+                # Prepare the handler arguments
+                handler_args = {
+                    'old_avatar': old_avatar,
+                    'new_avatar': new_avatar,
+                    'timestamp': time.time(),
+                    'source': 'vrchat'
+                }
+                
+                # Notify any registered handlers
                 for handler in self._handlers.get("/avatar/change", []):
                     try:
-                        handler(address, [new_avatar])
+                        handler(address, [new_avatar, handler_args])
+                        logger.debug(f"Notified handler for avatar change: {handler}")
                     except Exception as e:
-                        logger.error(f"Error in avatar change handler: {e}")
+                        logger.error(f"Error in avatar change handler {handler}: {e}", exc_info=True)
+                
+                # Also notify any wildcard handlers
+                wildcard_address = "/avatar/*"
+                if wildcard_address in self._handlers and wildcard_address != address:
+                    for handler in self._handlers[wildcard_address]:
+                        try:
+                            handler(address, ["change", new_avatar, handler_args])
+                            logger.debug(f"Notified wildcard handler for avatar change: {handler}")
+                        except Exception as e:
+                            logger.error(f"Error in wildcard avatar handler {handler}: {e}", exc_info=True)
+            else:
+                logger.debug(f"Received duplicate avatar change notification for: {new_avatar}")
+        else:
+            logger.warning(f"Received invalid avatar ID type: {type(new_avatar).__name__}")
     
-    def _handle_parameter_update(self, address: str, *args: Any) -> None:
-        """Handle parameter update notifications."""
-        if not args or not args[0]:
+    def _handle_default_message(self, address: str, *args: Any) -> None:
+        """Handle any OSC messages that don't have a specific handler.
+        
+        This method is called for any OSC message that doesn't match a registered
+        handler pattern. It's useful for debugging and logging unexpected messages.
+        
+        Args:
+            address: The OSC address of the unhandled message
+            *args: The arguments sent with the OSC message
+        """
+        # Skip empty messages
+        if not args:
             return
             
-        # Extract the parameter name from the address
-        param_name = address.split('/')[-1]
-        param_value = args[0][0] if isinstance(args[0], (list, tuple)) else args[0]
+        # Log the unhandled message for debugging
+        logger.debug(f"Received unhandled OSC message: {address} {args}")
         
-        # Log the parameter update
-        logger.debug(f"Parameter update - {param_name}: {param_value}")
+        # Check if this is an avatar-related message we might want to handle
+        if address.startswith("/avatar/"):
+            # Log avatar-related messages at a higher level since they might be important
+            logger.info(f"Unhandled avatar message: {address} {args}")
+            
+            # If we have a wildcard handler for avatar messages, notify it
+            wildcard_address = "/avatar/*"
+            if wildcard_address in self._handlers:
+                for handler in self._handlers[wildcard_address]:
+                    try:
+                        handler(address, args)
+                    except Exception as e:
+                        logger.error(f"Error in wildcard avatar handler for {address}: {e}", exc_info=True)
+    
+    def _handle_parameter_update(self, address: str, *args: Any) -> None:
+        """Handle parameter update notifications from VRChat.
         
-        # Notify any listeners about the parameter update
-        for handler in self._handlers.get(address, []):
-            try:
-                handler(address, [param_value])
-            except Exception as e:
-                logger.error(f"Error in parameter update handler for {address}: {e}")
+        This method is called when VRChat sends parameter updates for the current avatar.
+        It processes the parameter updates and notifies any registered handlers.
         
-        # Also notify any wildcard handlers
-        wildcard_address = "/avatar/parameters/*"
-        if wildcard_address in self._handlers and wildcard_address != address:
-            for handler in self._handlers[wildcard_address]:
+        Args:
+            address: The OSC address of the parameter (e.g., "/avatar/parameters/MyParam")
+            *args: The new value(s) of the parameter
+        """
+        if not args or not args[0]:
+            logger.debug(f"Received empty parameter update for {address}")
+            return
+            
+        try:
+            # Extract the parameter name from the address
+            param_name = address.split('/')[-1]
+            
+            # Extract the parameter value, handling different argument formats
+            param_value = args[0][0] if (args and isinstance(args[0], (list, tuple))) else args[0]
+            
+            # Log the parameter update at debug level
+            logger.debug(f"Parameter update - {param_name}: {param_value} (type: {type(param_value).__name__})")
+            
+            # Update statistics
+            self._connection_stats.messages_received += 1
+            
+            # Prepare the handler arguments
+            handler_args = {
+                'name': param_name,
+                'value': param_value,
+                'timestamp': time.time(),
+                'source': 'vrchat',
+                'address': address
+            }
+            
+            # Notify any specific handlers for this parameter
+            for handler in self._handlers.get(address, []):
                 try:
-                    handler(address, [param_name, param_value])
+                    handler(address, [param_value, handler_args])
+                    logger.debug(f"Notified handler for parameter {param_name}")
                 except Exception as e:
-                    logger.error(f"Error in wildcard parameter handler for {address}: {e}")
+                    logger.error(f"Error in parameter handler for {address}: {e}", exc_info=True)
+            
+            # Also notify any wildcard parameter handlers
+            param_wildcard = "/avatar/parameters/*"
+            if param_wildcard in self._handlers and param_wildcard != address:
+                for handler in self._handlers[param_wildcard]:
+                    try:
+                        handler(address, [param_name, param_value, handler_args])
+                        logger.debug(f"Notified wildcard handler for parameter {param_name}")
+                    except Exception as e:
+                        logger.error(f"Error in wildcard parameter handler for {address}: {e}", exc_info=True)
+                        
+            # Also notify any general avatar wildcard handlers
+            avatar_wildcard = "/avatar/*"
+            if avatar_wildcard in self._handlers and avatar_wildcard != address:
+                for handler in self._handlers[avatar_wildcard]:
+                    try:
+                        handler(address, ["parameter", param_name, param_value, handler_args])
+                        logger.debug(f"Notified avatar wildcard handler for parameter {param_name}")
+                    except Exception as e:
+                        logger.error(f"Error in avatar wildcard handler for {address}: {e}", exc_info=True)
+                        
+        except Exception as e:
+            logger.error(f"Error processing parameter update for {address}: {e}", exc_info=True)
