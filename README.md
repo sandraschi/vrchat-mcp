@@ -2,6 +2,16 @@
 
 A FastMCP 2.12+ implementation for controlling VRChat avatars and assets with support for intelligent NPCs, OSC communication, and more. Provides both MCP stdio interface for Claude Desktop and FastAPI HTTP API.
 
+## GitHub Topics
+
+[![MCP Server](https://img.shields.io/badge/MCP-Server-blue)](https://modelcontextprotocol.io/)
+[![FastMCP](https://img.shields.io/badge/FastMCP-2.12+-green)](https://github.com/jlowin/fastmcp)
+[![Claude Desktop](https://img.shields.io/badge/Claude-Desktop-orange)](https://docs.anthropic.com/claude/docs/desktop)
+[![VRChat](https://img.shields.io/badge/VRChat-Integration-purple)](https://docs.vrchat.com/)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue)](https://python.org)
+
+**Topics:** `mcp-server` `fastmcp` `claude-desktop` `vrchat` `python` `osc` `avatar-control` `plugin-system` `production-ready`
+
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
