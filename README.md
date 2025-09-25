@@ -1,6 +1,6 @@
 # VRChat MCP
 
-A FastMCP 2.12+ implementation for controlling VRChat avatars and assets with support for intelligent NPCs, OSC communication, and more. Provides both MCP stdio interface for Claude Desktop and FastAPI HTTP API.
+A FastMCP 2.12+ implementation for controlling VRChat avatars and assets via OSC protocol. Provides both MCP stdio interface for Claude Desktop integration and FastAPI HTTP API for web access.
 
 ## GitHub Topics
 
@@ -32,13 +32,19 @@ A FastMCP 2.12+ implementation for controlling VRChat avatars and assets with su
 - **✅ FastMCP 2.12+ Compatible** - Dual interface support (MCP stdio + FastAPI HTTP)
 - **✅ Plugin System** - Extensible architecture with decorator-based tool registration
 - **✅ OSC Integration** - Bidirectional communication with VRChat using Open Sound Control
-- **✅ Intelligent NPCs** - Advanced conversation management with language model integration
-- **✅ Avatar Control** - Dynamic parameter management and smooth interpolation
-- **✅ FastSearch** - Quick lookup of avatars, assets, and parameters
-- **✅ Comprehensive Help System** - Built-in documentation for all registered tools
+- **✅ Avatar Control** - Basic parameter management for VRChat avatars
+- **✅ Parameter Indexing** - Fast lookup of avatar parameters and OSC endpoints
+- **✅ Help System** - Built-in documentation for all registered tools
 - **✅ Modular Architecture** - Clean tool organization in category subdirectories
 - **✅ Production Testing** - Comprehensive unit, integration, and API testing
 - **✅ DXT Packaging** - Ready for Claude Desktop Extensions deployment
+
+## Planned Features
+
+- **🔄 Intelligent NPCs** - Advanced conversation management with language model integration
+- **🔄 Advanced Avatar Control** - Smooth interpolation and complex avatar state management
+- **🔄 FastSearch** - Sophisticated search and indexing across all VRChat assets
+- **🔄 Performance Monitoring** - Advanced metrics and rate limiting
 
 ## Production Readiness Status
 
@@ -53,11 +59,15 @@ A FastMCP 2.12+ implementation for controlling VRChat avatars and assets with su
 | **Error Handling** | ✅ Complete | Comprehensive error handling with graceful degradation |
 | **Logging** | ✅ Complete | Structured logging with configurable levels |
 | **FastAPI Endpoints** | ✅ Complete | Health check, OpenAPI docs, and API schema endpoints |
-| **OSC Integration** | ✅ Complete | Bidirectional OSC communication with VRChat |
+| **Basic OSC Integration** | ✅ Complete | OSC message sending and parameter indexing |
 | **Plugin System** | ✅ Complete | Extensible plugin architecture with decorators |
 | **Server Startup** | ✅ Complete | Reliable server startup in all modes |
+| **Avatar Control** | ✅ Complete | Basic parameter get/set operations |
+| **Parameter Indexing** | ✅ Complete | Fast lookup of avatar parameters and OSC endpoints |
+| **Advanced NPC System** | ❌ Planned | Language model integration and conversation management |
+| **Advanced Avatar Control** | ❌ Planned | Smooth interpolation and complex state management |
+| **Performance Monitoring** | ❌ Planned | Advanced metrics and comprehensive rate limiting |
 | **GitHub Infrastructure** | ⚠️ Partial | Repository structure ready, CI/CD pending |
-| **Performance Monitoring** | ⚠️ Partial | Rate limiting implemented, benchmarks pending |
 
 ## Installation
 
@@ -350,4 +360,4 @@ For support, please open an issue on the [GitHub repository](https://github.com/
 
 ---
 
-**🎯 Production Ready**: This VRChat MCP server meets all core production requirements with comprehensive testing, dual interface support, and reliable operation. Ready for integration with Claude Desktop and other MCP-compatible applications.
+**🎯 Production Ready Core**: This VRChat MCP server provides a solid foundation with reliable MCP/FastAPI dual interface support, comprehensive testing, and basic VRChat integration. Ready for integration with Claude Desktop. Advanced features (intelligent NPCs, advanced avatar control) are planned for future releases.
