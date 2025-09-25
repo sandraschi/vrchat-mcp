@@ -1,0 +1,2 @@
+[console_scripts]
+vrchat-mcp = vrchat_mcp.cli:main

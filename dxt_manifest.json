@@ -2,12 +2,12 @@
   "name": "vrchat-mcp",
   "version": "0.1.0",
   "display_name": "VRChat MCP",
-  "description": "MCP server for controlling VRChat avatars and assets with FastMCP 2.10",
+  "description": "MCP server for controlling VRChat avatars and assets with FastMCP 2.12+",
   "author": "Sandra Schi",
   "license": "MIT",
   
   "server": {
-    "command": ["python", "-m", "vrchat_mcp.server"],
+    "command": ["vrchat-mcp", "--mode", "dual"],
     "timeout": 30,
     "launch_delay": 0,
     "stdio": true,

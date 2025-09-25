@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "vrchat-mcp"
 version = "0.1.0"
-description = "VRChat MCP for controlling avatars and assets with FastMCP 2.10"
+description = "VRChat MCP for controlling avatars and assets with FastMCP 2.12"
 authors = [
     {name = "Sandra Schi"}
 ]
 license = {text = "MIT"}
 requires-python = ">=3.8"
 dependencies = [
-    "fastmcp>=2.10.0",
+    "fastmcp>=2.12.0",
     "python-osc>=1.8.1",
     "pydantic>=2.0.0",
     "fastapi>=0.95.0",

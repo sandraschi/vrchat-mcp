@@ -16,7 +16,7 @@ from pathlib import Path
 import aiohttp
 from aiohttp import web
 import websockets
-from websockets.server import WebSocketServerProtocol
+from websockets import WebSocketServerProtocol
 
 from .osc_inspector import OSCInspector, MessageDirection, MessageRecord
 

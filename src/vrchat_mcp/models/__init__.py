@@ -1,29 +1,28 @@
-""
+"""
 Pydantic models for VRChat MCP requests and responses.
 
 This module defines the data structures used for communication with the VRChat MCP server.
 """
 
-from typing import Dict, List, Literal, Optional, Union
-from pydantic import BaseModel, Field, HttpUrl
-from enum import Enum
+from typing import Any, Dict, List, Optional, Union
+from pydantic import BaseModel, Field
 
 # Base response models
 class StatusResponse(BaseModel):
     """Base response model with status information."""
-    status: Literal["success", "error"]
+    status: str
     message: Optional[str] = None
     error: Optional[str] = None
     details: Optional[Dict[str, Any]] = None
 
 class SuccessResponse(StatusResponse):
     """Successful operation response."""
-    status: Literal["success"] = "success"
+    status: str = "success"
     data: Optional[Dict[str, Any]] = None
 
 class ErrorResponse(StatusResponse):
     """Error response model."""
-    status: Literal["error"] = "error"
+    status: str = "error"
     error: str
     code: Optional[int] = None
 
@@ -33,7 +32,7 @@ class AvatarLoadRequest(BaseModel):
     preset_name: str = Field(..., description="Name of the avatar preset to load")
     avatar_id: Optional[str] = Field(None, description="Optional avatar ID for multi-avatar support")
     parameters: Optional[Dict[str, Union[bool, float, int, str]]] = Field(
-        None, 
+        None,
         description="Initial parameters to set on the avatar"
     )
 
@@ -74,6 +73,19 @@ class OSCBundle(BaseModel):
     timestamp: Optional[float] = None
     content: List[Union[OSCMessage, 'OSCBundle']]
 
+# Avatar State Models
+class ParameterValue(BaseModel):
+    """Model for parameter values with metadata."""
+    name: str
+    value: Union[bool, float, int, str]
+    timestamp: Optional[float] = None
+
+class AvatarState(BaseModel):
+    """Model for avatar state tracking."""
+    avatar_id: str
+    parameters: Dict[str, Union[bool, float, int, str]] = {}
+    loaded_at: Optional[float] = None
+
 # Search Models
 class SearchResult(BaseModel):
     """Model for search results."""
@@ -103,6 +115,8 @@ __all__ = [
     'NPCConversationRequest',
     'OSCMessage',
     'OSCBundle',
+    'ParameterValue',
+    'AvatarState',
     'SearchResult',
     'SearchRequest'
 ]

@@ -31,6 +31,64 @@ class EasingFunction(Enum):
     ELASTIC_OUT = auto()
     BOUNCE_OUT = auto()
 
+class InterpolationSystem:
+    """System for managing parameter interpolation with easing functions."""
+
+    def __init__(self):
+        """Initialize the interpolation system."""
+        pass
+
+    @staticmethod
+    def ease_linear(t: float) -> float:
+        """Linear easing function."""
+        return t
+
+    @staticmethod
+    def ease_in_quad(t: float) -> float:
+        """Quadratic ease-in function."""
+        return t * t
+
+    @staticmethod
+    def ease_out_quad(t: float) -> float:
+        """Quadratic ease-out function."""
+        return t * (2 - t)
+
+    @staticmethod
+    def ease_in_out_quad(t: float) -> float:
+        """Quadratic ease-in-out function."""
+        return 2 * t * t if t < 0.5 else -1 + (4 - 2 * t) * t
+
+    @staticmethod
+    def ease_in_cubic(t: float) -> float:
+        """Cubic ease-in function."""
+        return t * t * t
+
+    @staticmethod
+    def ease_out_cubic(t: float) -> float:
+        """Cubic ease-out function."""
+        t -= 1
+        return t * t * t + 1
+
+    @staticmethod
+    def ease_in_out_cubic(t: float) -> float:
+        """Cubic ease-in-out function."""
+        return 4 * t * t * t if t < 0.5 else (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
+
+    @staticmethod
+    def ease_in_sine(t: float) -> float:
+        """Sine ease-in function."""
+        return 1 - math.cos((t * math.pi) / 2)
+
+    @staticmethod
+    def ease_out_sine(t: float) -> float:
+        """Sine ease-out function."""
+        return math.sin((t * math.pi) / 2)
+
+    @staticmethod
+    def ease_in_out_sine(t: float) -> float:
+        """Sine ease-in-out function."""
+        return -(math.cos(math.pi * t) - 1) / 2
+
 @dataclass
 class InterpolationTarget:
     """Target value and interpolation settings for a parameter."""

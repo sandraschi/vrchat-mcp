@@ -4,9 +4,10 @@ Plugin system for VRChat MCP.
 This module provides a plugin architecture for extending VRChat MCP functionality.
 """
 
-from typing import Type, Dict, List, Any, Optional, TypeVar, Generic
+from typing import Type, Dict, List, Any, Optional, TypeVar, Generic, Callable
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+import asyncio
 import importlib
 import inspect
 import pkgutil
@@ -144,38 +145,252 @@ def tool(
     name: Optional[str] = None,
     description: str = "",
     category: str = "General",
-    args: Optional[Dict[str, Any]] = None,
+    args: Optional[Dict[str, Dict[str, Any]]] = None,
     returns: Optional[Dict[str, Any]] = None,
-    examples: Optional[List[Dict[str, Any]]] = None
-):
-    """Decorator for creating MCP tools from plugin methods.
-    
+    examples: Optional[List[Dict[str, Any]]] = None,
+    requires_auth: bool = False,
+    rate_limit: Optional[Dict[str, Any]] = None,
+    **kwargs: Any
+) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    """Create a tool from a method, making it available through the MCP interface.
+
+    This decorator transforms a method into a tool that can be called through the MCP
+    interface. The tool's metadata is used for documentation, validation, and
+    discovery.
+
+    The decorator supports both simple and complex tool definitions, with automatic
+    extraction of parameter information from type hints and docstrings.
+
+    Example:
+        ```python
+        @tool(
+            name="example_tool",
+            category="Examples",
+            description="An example tool that demonstrates the decorator usage.",
+            args={
+                "param1": {
+                    "type": "string",
+                    "description": "First parameter",
+                    "required": True
+                },
+                "param2": {
+                    "type": "integer",
+                    "description": "Second parameter with default",
+                    "default": 42,
+                    "required": False
+                }
+            },
+            returns={
+                "type": "object",
+                "description": "Result of the operation",
+                "schema": {
+                    "success": {"type": "boolean"},
+                    "message": {"type": "string"}
+                }
+            },
+            examples=[
+                {
+                    "description": "Basic usage",
+                    "code": "example_tool(param1='test', param2=123)",
+                    "returns": "{'success': True, 'message': 'Operation completed'}"
+                }
+            ],
+            requires_auth=True,
+            rate_limit={"calls": 10, "interval": 60}
+        )
+        def my_tool(param1: str, param2: int = 42) -> Dict[str, Any]:
+            # Tool implementation here
+            return {"success": True, "message": f"Processed {param1} and {param2}"}
+        ```
+
     Args:
-        name: Tool name (defaults to method name)
-        description: Tool description
-        category: Tool category for organization
-        args: Dictionary describing the tool's arguments
-        returns: Dictionary describing the tool's return value
-        examples: List of example usages
+        name: The name of the tool. If not provided, the function name will be used.
+        description: A short description of what the tool does. If not provided,
+                    the first line of the function's docstring will be used.
+        category: The category this tool belongs to, used for organization in UIs.
+        args: A dictionary defining the tool's parameters. Each key is a parameter
+              name, and each value is a dictionary with parameter metadata:
+              - type: The parameter type (string, number, boolean, object, array, or a Python type)
+              - description: Description of the parameter
+              - required: Whether the parameter is required (default: True)
+              - default: Default value if not provided
+              - example: Example value for documentation
+        returns: A dictionary describing the return value:
+                - type: The return type
+                - description: Description of the return value
+                - schema: Optional JSON schema for complex return types
+        examples: List of example usages, each with:
+                 - description: What the example demonstrates
+                 - code: Example code snippet
+                 - returns: Expected return value or description
+        requires_auth: If True, the tool requires authentication to be called.
+        rate_limit: Rate limiting configuration:
+                   - calls: Maximum number of calls allowed
+                   - interval: Time window in seconds
+        **kwargs: Additional metadata that will be stored with the tool.
+
+    Returns:
+        A decorator that converts a method into an MCP tool.
+
+    Note:
+        The decorator will automatically extract parameter information from the
+        function's type hints and docstring if they are not explicitly provided
+        in the `args` parameter.
     """
-    def decorator(method):
+    def decorator(method: Callable[..., Any]) -> Callable[..., Any]:
+        # Get the function's docstring and signature
+        doc = inspect.getdoc(method) or ""
+        sig = inspect.signature(method)
+        
+        # Extract description from docstring if not provided
+        final_description = description
+        if not final_description and doc:
+            # Get the first non-empty line as the short description
+            final_description = next(
+                (line.strip() for line in doc.split('\n') if line.strip()),
+                ""
+            )
+        
+        # Parse parameter information from docstring
+        param_docs: Dict[str, str] = {}
+        if doc and 'Args:' in doc:
+            # Extract the Args section
+            arg_section = doc.split('Args:')[1].split('Returns:')[0] if 'Returns:' in doc else doc.split('Args:')[1]
+            # Parse each parameter's documentation
+            for param_block in arg_section.split('\n    ')[1:]:
+                if ':' in param_block:
+                    param_name = param_block.split(':')[0].strip()
+                    param_desc = ':'.join(param_block.split(':')[1:]).strip()
+                    param_docs[param_name] = param_desc
+        
+        # Process parameters
+        final_args: Dict[str, Dict[str, Any]] = {}
+        
+        # Start with explicitly provided args
+        if args:
+            for arg_name, arg_info in args.items():
+                final_args[arg_name] = {
+                    'type': arg_info.get('type', 'string'),
+                    'description': arg_info.get('description', param_docs.get(arg_name, '')),
+                    'required': arg_info.get('required', True),
+                    'default': arg_info.get('default'),
+                    'example': arg_info.get('example')
+                }
+        
+        # Add parameters from type hints if not already defined
+        for param_name, param in sig.parameters.items():
+            if param_name == 'self' or param_name in final_args:
+                continue
+                
+            param_type = 'string'
+            if param.annotation != inspect.Parameter.empty:
+                if hasattr(param.annotation, '__name__'):
+                    param_type = param.annotation.__name__
+                elif hasattr(param.annotation, '_name'):
+                    param_type = param.annotation._name or 'string'
+            
+            final_args[param_name] = {
+                'type': param_type,
+                'description': param_docs.get(param_name, ''),
+                'required': param.default == inspect.Parameter.empty,
+                'default': param.default if param.default != inspect.Parameter.empty else None
+            }
+        
+        # Process return type
+        final_returns = returns or {}
+        if not final_returns and 'return' in method.__annotations__:
+            return_type = method.__annotations__['return']
+            if hasattr(return_type, '__name__'):
+                final_returns = {
+                    'type': return_type.__name__,
+                    'description': ''
+                }
+        
+        # Get return description from docstring if available
+        if doc and 'Returns:' in doc:
+            returns_section = doc.split('Returns:')[1]
+            if 'Raises:' in returns_section:
+                returns_section = returns_section.split('Raises:')[0]
+            returns_desc = returns_section.strip()
+            if returns_desc:
+                if not final_returns:
+                    final_returns = {'type': 'any'}
+                final_returns['description'] = returns_desc
+        
+        # Create tool metadata
         method._is_tool = True
         method._tool_metadata = {
             'name': name or method.__name__,
-            'description': description or method.__doc__ or "",
+            'description': final_description,
             'category': category,
-            'args': args or {},
-            'returns': returns or {},
-            'examples': examples or []
+            'args': final_args,
+            'returns': final_returns,
+            'examples': examples or [],
+            'requires_auth': requires_auth,
+            'rate_limit': rate_limit or {},
+            'docstring': doc,
+            'signature': str(sig),
+            **kwargs  # Include any additional metadata
         }
+        
+        # Preserve the original function and its attributes
+        method._original = method
+        method.__signature__ = sig  # For better help() and inspect support
+        
+        # Update the docstring to include the tool's metadata
+        if not method.__doc__:
+            method.__doc__ = final_description
+        
         return method
+    
     return decorator
 
-def event_listener(event_type: str):
-    """Decorator for marking methods as event listeners."""
-    def decorator(method):
+def event_listener(event_type: str) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+    """Decorator for marking methods as event listeners.
+    
+    This decorator registers a method to be called when a specific event occurs in the MCP system.
+    The method will receive the event data as its first argument.
+    
+    Args:
+        event_type: The type of event to listen for. This should be a string that
+                   identifies the event, such as 'user_joined' or 'message_received'.
+                   
+    Example:
+        class MyPlugin(Plugin):
+            @event_listener('user_joined')
+            async def on_user_joined(self, user_data: Dict[str, Any]) -> None:
+                # Handle user join events
+                logger.info(f"User joined: {user_data['username']}")
+                
+    Note:
+        The decorated method should be an async function that takes at least one argument
+        (the event data) and returns None.
+    """
+    def decorator(method: Callable[..., Any]) -> Callable[..., Any]:
+        if not asyncio.iscoroutinefunction(method):
+            raise TypeError("Event listener must be an async function")
+            
+        # Get the method's signature to validate parameters
+        sig = inspect.signature(method)
+        params = list(sig.parameters.values())
+        
+        # Ensure the method has at least one parameter (self)
+        if len(params) < 1:
+            raise TypeError("Event listener must have at least 'self' parameter")
+            
+        # Store event listener metadata
         if not hasattr(method, '_event_listeners'):
             method._event_listeners = []
-        method._event_listeners.append(event_type)
+            
+        method._event_listeners.append({
+            'event_type': event_type,
+            'method_name': method.__name__
+        })
+        
+        # Preserve the original function's signature and docstring
+        method._original = method
+        method.__signature__ = sig
+        
         return method
+        
     return decorator
