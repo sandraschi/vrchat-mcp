@@ -1,0 +1,47 @@
+{
+  "name": "npc_conversation",
+  "description": "Start and manage conversations with VRChat NPCs",
+  "version": "1.0.0",
+  "parameters": {
+    "npc_id": {
+      "type": "string",
+      "description": "ID of the NPC to interact with",
+      "required": true
+    },
+    "user_id": {
+      "type": "string",
+      "description": "ID of the user initiating the conversation",
+      "required": true
+    },
+    "message": {
+      "type": "string",
+      "description": "Message to send to the NPC",
+      "required": true
+    },
+    "conversation_id": {
+      "type": "string",
+      "description": "Existing conversation ID to continue (optional)",
+      "required": false
+    }
+  },
+  "template": "Interact with NPC {npc_id} as user {user_id}. Send message: '{message}'{conversation_text}",
+  "examples": [
+    {
+      "input": {
+        "npc_id": "guide_bot",
+        "user_id": "player123",
+        "message": "Hello, can you help me find the main hall?"
+      },
+      "output": "Interact with NPC guide_bot in VRChat. Start new conversation with message: 'Hello, can you help me find the main hall?'"
+    },
+    {
+      "input": {
+        "npc_id": "shop_keeper",
+        "user_id": "player123",
+        "message": "What items do you have for sale?",
+        "conversation_id": "conv_abc123"
+      },
+      "output": "Interact with NPC shop_keeper in VRChat. Continue existing conversation with message: 'What items do you have for sale?'"
+    }
+  ]
+}

@@ -1,18 +1,61 @@
 # VRChat MCP
 
-A FastMCP 2.12+ implementation for controlling VRChat avatars and assets via OSC protocol. Provides both MCP stdio interface for Claude Desktop integration and FastAPI HTTP API for web access.
+A FastMCP 2.12+ implementation for controlling VRChat avatars and assets via OSC protocol. **Designed primarily for Claude Desktop integration** - allows you to control VRChat using natural language commands. Also provides FastAPI HTTP API for web access.
 
 ## GitHub Topics
 
+[![Claude Desktop](https://img.shields.io/badge/Claude-Desktop-orange)](https://docs.anthropic.com/claude/docs/desktop)
 [![MCP Server](https://img.shields.io/badge/MCP-Server-blue)](https://modelcontextprotocol.io/)
 [![FastMCP](https://img.shields.io/badge/FastMCP-2.12+-green)](https://github.com/jlowin/fastmcp)
-[![Claude Desktop](https://img.shields.io/badge/Claude-Desktop-orange)](https://docs.anthropic.com/claude/docs/desktop)
 [![VRChat](https://img.shields.io/badge/VRChat-Integration-purple)](https://docs.vrchat.com/)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue)](https://python.org)
 
 **Topics:** `mcp-server` `fastmcp` `claude-desktop` `vrchat` `python` `osc` `avatar-control` `plugin-system` `production-ready`
 
+## Claude Desktop Quick Start
+
+The easiest way to use VRChat MCP is through Claude Desktop:
+
+### 1. Install the MCP Server
+```bash
+# Install from PyPI (when published)
+pip install vrchat-mcp
+
+# Or install from source
+git clone https://github.com/sandraschi/vrchat-mcp.git
+cd vrchat-mcp
+pip install -e .
+```
+
+### 2. Configure Claude Desktop
+Add this to your Claude Desktop configuration file:
+
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "vrchat": {
+      "command": "vrchat-mcp",
+      "args": ["--mode", "mcp"]
+    }
+  }
+}
+```
+
+### 3. Restart Claude Desktop
+Restart Claude Desktop to load the new MCP server.
+
+### 4. Start Controlling VRChat
+In Claude Desktop, you can now use natural language commands like:
+- "Load avatar with ID abc123"
+- "Set the happy parameter to 0.8"
+- "Send OSC message to /avatar/parameters/CustomParam with value 1.0"
+- "Check VRChat connection status"
+
 ## Table of Contents
+- [Claude Desktop Quick Start](#claude-desktop-quick-start)
 - [Features](#features)
 - [Installation](#installation)
 - [Configuration](#configuration)
