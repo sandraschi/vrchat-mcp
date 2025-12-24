@@ -1,5 +1,7 @@
 # VRChat MCP
 
+**By FlowEngineer sandraschi**
+
 A FastMCP 2.12+ implementation for controlling VRChat avatars and assets via OSC protocol. **Designed primarily for Claude Desktop integration** - allows you to control VRChat using natural language commands. Also provides FastAPI HTTP API for web access.
 
 ## GitHub Topics

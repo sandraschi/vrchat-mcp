@@ -1,0 +1,40 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": ["sandraschi"],
+  "name": "vrchat-mcp",
+  "description": "FastMCP 2.12+ server for controlling VRChat avatars and assets via OSC protocol. Also provides FastAPI HTTP API. Beta status.",
+  "type": "mcp_server",
+  "status": "alpha",
+  "framework": "FastMCP 2.12+",
+  "tools": 8,
+  "transport": ["stdio", "http"],
+  "keywords": [
+    "vrchat",
+    "osc",
+    "avatar-control",
+    "vr",
+    "social-vr",
+    "mcp-server",
+    "fastmcp",
+    "claude-desktop"
+  ],
+  "features": {
+    "osc_control": {
+      "enabled": true,
+      "protocol": "OSC",
+      "note": "Primary control method for VRChat"
+    },
+    "avatar_control": {
+      "enabled": true
+    },
+    "asset_management": {
+      "enabled": true
+    },
+    "http_api": {
+      "enabled": true,
+      "framework": "FastAPI",
+      "note": "Also provides HTTP API for web access"
+    }
+  }
+}
+
