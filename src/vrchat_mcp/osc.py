@@ -13,9 +13,9 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
-from python_osc.dispatcher import Dispatcher
-from python_osc.osc_server import AsyncIOOSCUDPServer
-from python_osc.udp_client import SimpleUDPClient
+from pythonosc.dispatcher import Dispatcher
+from pythonosc.osc_server import AsyncIOOSCUDPServer
+from pythonosc.udp_client import SimpleUDPClient
 
 logger = logging.getLogger(__name__)
 

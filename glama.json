@@ -35,6 +35,51 @@
       "framework": "FastAPI",
       "note": "Also provides HTTP API for web access"
     }
+  },
+  "mcpServers": {
+    "vrchat-mcp": {
+      "command": "python",
+      "args": ["-m", "vrchat_mcp.server"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+      "description": "VRChat avatar and asset control via OSC protocol",
+      "capabilities": {
+        "tools": {
+          "enabled": true
+        },
+        "resources": {
+          "enabled": false
+        },
+        "prompts": {
+          "enabled": false
+        }
+      },
+      "timeout": {
+        "initialize": 30000,
+        "message": 60000
+      },
+      "metadata": {
+        "version": "0.1.0",
+        "author": "Sandra Schi",
+        "homepage": "https://github.com/sandraschi/vrchat-mcp",
+        "license": "MIT",
+        "tags": [
+          "vrchat",
+          "osc",
+          "avatar-control",
+          "vr",
+          "social-vr",
+          "mcp-server",
+          "fastmcp"
+        ],
+        "categories": [
+          "Virtual Reality",
+          "Automation",
+          "Gaming"
+        ]
+      }
+    }
   }
 }
 

@@ -3,6 +3,7 @@ README.md
 pyproject.toml
 src/vrchat_mcp/__init__.py
 src/vrchat_mcp/__main__.py
+src/vrchat_mcp/api_manager.py
 src/vrchat_mcp/avatar_manager.py
 src/vrchat_mcp/cli.py
 src/vrchat_mcp/debug_ui.py

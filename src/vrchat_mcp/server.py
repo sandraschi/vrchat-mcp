@@ -21,10 +21,12 @@ def main() -> int:
 
         logger.info("Starting VRChat MCP server with dual interface support...")
         logger.info("MCP stdio interface: Available for Claude Desktop integration")
-        logger.info("FastAPI HTTP interface: Available with /api/docs and /health endpoints")
+        logger.info(
+            "FastAPI HTTP interface: Available with /api/docs and /health endpoints"
+        )
 
-        # Start the server (FastMCP handles both interfaces automatically)
-        asyncio.run(mcp_instance.start())
+        # Start the server in MCP stdio mode for MCP clients
+        asyncio.run(mcp_instance.start(mode="mcp"))
 
         return 0
 
@@ -34,7 +36,7 @@ def main() -> int:
     except Exception as e:
         logger.exception("Fatal error in server")
         return 1
-    
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -13,6 +13,7 @@ Requires-Dist: fastapi>=0.95.0
 Requires-Dist: uvicorn>=0.21.0
 Requires-Dist: python-dotenv>=1.0.0
 Requires-Dist: loguru>=0.7.0
+Requires-Dist: httpx>=0.24.0
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0.0; extra == "dev"
 Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
