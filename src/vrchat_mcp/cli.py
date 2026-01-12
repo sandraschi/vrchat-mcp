@@ -78,33 +78,11 @@ Examples:
   # Run and save logs to file
   vrchat-mcp --log-file vrchat-mcp.log
 
-  # Run FastAPI server only
-  vrchat-mcp --mode fastapi --host 0.0.0.0 --port 8000
-
-  # Run MCP stdio server only
-  vrchat-mcp --mode mcp
+  # Run MCP stdio server (default behavior)
+  vrchat-mcp
         """
     )
 
-    parser.add_argument(
-        "--mode",
-        choices=["dual", "mcp", "fastapi"],
-        default="dual",
-        help="Server mode: dual (both MCP and FastAPI), mcp (stdio only), fastapi (HTTP only)"
-    )
-
-    parser.add_argument(
-        "--host",
-        default="127.0.0.1",
-        help="Host for FastAPI server (default: 127.0.0.1)"
-    )
-
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8000,
-        help="Port for FastAPI server (default: 8000)"
-    )
 
     parser.add_argument(
         "--config",
@@ -179,40 +157,15 @@ Examples:
     return parser
 
 
-async def run_dual_mode(mcp_instance: VRChatMCP, host: str, port: int) -> None:
-    """Run both MCP and FastAPI servers simultaneously."""
-    logger.info(f"Starting VRChat MCP server in dual mode (MCP + FastAPI on {host}:{port})")
-
-    try:
-        # FastMCP 2.12+ automatically provides both interfaces
-        # The mcp.start() method handles both stdio and HTTP protocols
-        await mcp_instance.start(mode="dual", host=host, port=port)
-    except Exception as e:
-        logger.error(f"Failed to start dual mode server: {e}")
-        raise
-
-
 async def run_mcp_mode(mcp_instance: VRChatMCP) -> None:
-    """Run MCP stdio server only."""
+    """Run MCP stdio server only (like notepadpp-mcp)."""
     logger.info("Starting VRChat MCP server in MCP stdio mode")
 
     try:
-        # For MCP-only mode, run stdio transport
-        await mcp_instance.start(mode="mcp")
+        # Run MCP stdio server (like notepadpp-mcp)
+        await mcp_instance.start()
     except Exception as e:
         logger.error(f"Failed to start MCP mode server: {e}")
-        raise
-
-
-async def run_fastapi_mode(mcp_instance: VRChatMCP, host: str, port: int) -> None:
-    """Run FastAPI HTTP server only."""
-    logger.info(f"Starting VRChat MCP server in FastAPI mode on {host}:{port}")
-
-    try:
-        # For FastAPI-only mode, run HTTP server
-        await mcp_instance.start(mode="fastapi", host=host, port=port)
-    except Exception as e:
-        logger.error(f"Failed to start FastAPI mode server: {e}")
         raise
 
 
@@ -252,13 +205,8 @@ async def main_async(args: argparse.Namespace) -> int:
         # Create MCP instance
         mcp_instance = VRChatMCP(config)
 
-        # Run the appropriate server mode
-        if args.mode == "dual":
-            await run_dual_mode(mcp_instance, args.host, args.port)
-        elif args.mode == "mcp":
-            await run_mcp_mode(mcp_instance)
-        elif args.mode == "fastapi":
-            await run_fastapi_mode(mcp_instance, args.host, args.port)
+        # Run MCP stdio server (like notepadpp-mcp)
+        await run_mcp_mode(mcp_instance)
 
         return 0
 
