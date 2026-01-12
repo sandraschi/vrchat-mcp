@@ -576,7 +576,7 @@ class VRChatMCP:
             # Register tools on the MCP-only instance
             self._register_tools_on_instance(mcp_stdio)
             # Run in stdio mode (no HTTP server)
-            await mcp_stdio.run_async(transport="stdio")
+            await mcp_stdio.run_stdio_async()
         else:
             raise ValueError(f"Unknown server mode: {mode}")
 
