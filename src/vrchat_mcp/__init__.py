@@ -28,11 +28,12 @@ from .secrets import secrets_manager
 from .debug_ui import DebugUI
 from .models import AvatarState, ParameterValue
 
-# Configure logging
+# Configure logging (MCP servers must use stderr, not stdout)
+import sys
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler()],
+    handlers=[logging.StreamHandler(sys.stderr)],
 )
 logger = logging.getLogger(__name__)
 
@@ -242,7 +243,11 @@ class VRChatMCP:
     def _setup_logging(self) -> None:
         """Configure logging based on the configuration."""
         level = getattr(logging, self.config["logging"]["level"].upper(), logging.INFO)
-        logging.basicConfig(level=level)
+        logging.basicConfig(
+            level=level,
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            handlers=[logging.StreamHandler(sys.stderr)],
+        )
 
         if self.config["logging"].get("file"):
             file_handler = logging.FileHandler(self.config["logging"]["file"])

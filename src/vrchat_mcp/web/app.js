@@ -76,7 +76,7 @@ class MCPDebugger {
             case 'status':
             case 'status_update': this.updateStatus(data.status); break;
             case 'error': console.error('Server error:', data.message); break;
-            default: console.log('Unhandled message type:', data.type, data);
+            default: console.warn('Unhandled message type:', data.type);
         }
     }
     

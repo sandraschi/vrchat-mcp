@@ -27,8 +27,8 @@ def setup_logging(level: str = "INFO", log_file: Optional[str] = None) -> None:
         "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
     )
 
-    # Setup console handler
-    console_handler = logging.StreamHandler(sys.stdout)
+    # Setup console handler (MCP servers must use stderr, not stdout)
+    console_handler = logging.StreamHandler(sys.stderr)
     console_handler.setFormatter(console_formatter)
     console_handler.setLevel(numeric_level)
 
