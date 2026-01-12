@@ -237,8 +237,8 @@ class VRChatMCP:
                 port=self.config["debug_ui"]["port"],
             )
 
-        # Register tools
-        self._register_tools()
+        # Register tools on the main instance
+        self._register_tools_on_instance(self.mcp)
 
     def _setup_logging(self) -> None:
         """Configure logging based on the configuration."""
@@ -258,27 +258,22 @@ class VRChatMCP:
             )
             logging.getLogger().addHandler(file_handler)
 
-    def _register_tools(self) -> None:
-        """Register all MCP tools."""
+    def _register_tools_on_instance(self, mcp_instance) -> None:
+        """Register all MCP tools on a specific FastMCP instance."""
         # API Tools
-        self._register_api_tools()
+        self._register_api_tools_on_instance(mcp_instance)
 
-    def _register_api_tools(self) -> None:
-        """Register API-related tools."""
-        # Stub implementation - API tools can be added here later
-        pass
-
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def get_avatar_state(avatar_id: str) -> Dict[str, Any]:
             """Get the current state of an avatar."""
             return await self.avatar_manager.get_avatar_state(avatar_id)
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def load_avatar(avatar_id: str) -> Dict[str, Any]:
             """Load an avatar by ID."""
             return await self.avatar_manager.load_avatar(avatar_id)
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def set_parameter(
             avatar_id: str,
             parameter: str,
@@ -292,14 +287,14 @@ class VRChatMCP:
                 avatar_id, parameter, value, interpolate, duration, easing
             )
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def get_parameter(
             avatar_id: str, parameter: str
         ) -> Optional[Union[bool, float, int, str]]:
             """Get a parameter value for an avatar."""
             return await self.avatar_manager.get_parameter(avatar_id, parameter)
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def send_osc_message(
             address: str, args: List[Union[bool, float, int, str]]
         ) -> bool:
@@ -323,20 +318,20 @@ class VRChatMCP:
                 logger.error(f"Failed to send OSC message: {e}")
                 return False
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def get_osc_statistics() -> Dict[str, Any]:
             """Get OSC communication statistics."""
             return self.osc_inspector.get_statistics()
 
         # System and Help Tools (required by MCP Production Checklist)
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def get_server_status() -> Dict[str, Any]:
             """Get comprehensive server status information."""
             return {
                 "server": "vrchat-mcp",
                 "version": __version__,
                 "status": "running",
-                "interfaces": ["mcp_stdio", "fastapi_http"],
+                "interfaces": ["mcp_stdio"],
                 "components": {
                     "osc_inspector": self.osc_inspector.is_running()
                     if hasattr(self.osc_inspector, "is_running")
@@ -352,7 +347,7 @@ class VRChatMCP:
                 },
             }
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def get_health_status() -> Dict[str, Any]:
             """Get health check status (returns 200 OK for HTTP health endpoint)."""
             return {
@@ -368,7 +363,7 @@ class VRChatMCP:
                 },
             }
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def get_performance_metrics() -> Dict[str, Any]:
             """Get comprehensive performance metrics for the MCP server.
 
@@ -382,7 +377,7 @@ class VRChatMCP:
                 logger.error(f"Failed to get performance metrics: {e}")
                 return {"status": "error", "error": str(e)}
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def check_rate_limit(client_id: str = "default") -> Dict[str, Any]:
             """Check current rate limit status for a client.
 
@@ -407,7 +402,7 @@ class VRChatMCP:
                 logger.error(f"Failed to check rate limit: {e}")
                 return {"status": "error", "error": str(e)}
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def manage_secrets(
             action: str, key: str = "", value: Any = None, encrypted: bool = False
         ) -> Dict[str, Any]:
@@ -467,7 +462,7 @@ class VRChatMCP:
                 logger.error(f"Failed to manage secrets: {e}")
                 return {"status": "error", "error": str(e)}
 
-        @self.mcp.tool()
+        @mcp_instance.tool()
         async def get_help(topic: str = "general") -> Dict[str, Any]:
             """Get multilevel help information about VRChat MCP tools and usage.
 
@@ -483,8 +478,7 @@ class VRChatMCP:
             help_content = {
                 "general": {
                     "description": "VRChat MCP Server provides control over VRChat avatars and assets via OSC protocol",
-                    "interfaces": ["MCP stdio protocol", "FastAPI HTTP API"],
-                    "endpoints": ["/api/docs (OpenAPI)", "/health (health check)"],
+                    "interfaces": ["MCP stdio protocol"],
                     "tools": ["avatar", "parameter", "osc", "system"],
                     "usage": "Use 'get_help' with specific topic for detailed information",
                 },
@@ -522,10 +516,7 @@ class VRChatMCP:
                 },
                 "api": {
                     "description": "HTTP API access via FastAPI",
-                    "docs": "Visit /api/docs for interactive OpenAPI documentation",
-                    "health": "GET /health returns server health status",
-                    "endpoints": "All MCP tools available as REST endpoints",
-                    "format": "JSON request/response format",
+                    "note": "HTTP API not available in MCP-only mode",
                 },
             }
 
@@ -536,6 +527,15 @@ class VRChatMCP:
                     "available_topics": list(help_content.keys()),
                 },
             )
+
+    def _register_api_tools_on_instance(self, mcp_instance) -> None:
+        """Register API-related tools on a specific FastMCP instance."""
+        # Stub implementation - API tools can be added here later
+        pass
+
+    def _register_tools(self) -> None:
+        """Register all MCP tools on the main instance."""
+        self._register_tools_on_instance(self.mcp)
 
     async def start(
         self, mode: str = "dual", host: str = "127.0.0.1", port: int = 8000
@@ -567,9 +567,16 @@ class VRChatMCP:
             logger.info(f"Starting FastAPI HTTP server on {host}:{port}")
             await self.mcp.run_http_async(host=host, port=port)
         elif mode == "mcp":
-            # For MCP-only mode, run stdio
+            # For MCP-only mode, create a separate MCP instance without HTTP routes
             logger.info("Starting MCP stdio server")
-            await self.mcp.run_async(transport="stdio")
+            mcp_stdio = FastMCP(
+                name="vrchat-mcp",
+                instructions="MCP server for VRChat avatar and asset control",
+            )
+            # Register tools on the MCP-only instance
+            self._register_tools_on_instance(mcp_stdio)
+            # Run in stdio mode (no HTTP server)
+            await mcp_stdio.run_async(transport="stdio")
         else:
             raise ValueError(f"Unknown server mode: {mode}")
 
