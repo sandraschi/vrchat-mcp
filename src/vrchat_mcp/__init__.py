@@ -16,6 +16,9 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Set, List, Union
 
 from fastmcp import FastMCP
+from mcp.server import Server
+from mcp.server.stdio import stdio_server
+from mcp import Tool
 
 # Import submodules
 from .osc_inspector import OSCInspector, MessageDirection, MessageRecord
@@ -541,6 +544,287 @@ class VRChatMCP:
         # Stub implementation - API tools can be added here later
         pass
 
+    async def _run_pure_mcp_stdio(self) -> None:
+        """Run a pure MCP stdio server without FastMCP HTTP components."""
+        server = Server(
+            name="vrchat-mcp",
+            instructions="MCP server for VRChat avatar and asset control",
+        )
+
+        # Register tools using raw MCP API
+        @server.call_tool()
+        async def get_avatar_state(avatar_id: str) -> Dict[str, Any]:
+            """Get the current state of an avatar."""
+            return await self.avatar_manager.get_avatar_state(avatar_id)
+
+        @server.call_tool()
+        async def load_avatar(avatar_id: str) -> Dict[str, Any]:
+            """Load an avatar by ID."""
+            return await self.avatar_manager.load_avatar(avatar_id)
+
+        @server.call_tool()
+        async def set_parameter(
+            avatar_id: str,
+            parameter: str,
+            value: Union[bool, float, int, str],
+            interpolate: bool = False,
+            duration: float = 0.5,
+            easing: str = "linear",
+        ) -> bool:
+            """Set a parameter value for an avatar with optional interpolation."""
+            return await self.avatar_manager.set_parameter(
+                avatar_id, parameter, value, interpolate, duration, easing
+            )
+
+        @server.call_tool()
+        async def get_parameter(
+            avatar_id: str, parameter: str
+        ) -> Optional[Union[bool, float, int, str]]:
+            """Get a parameter value for an avatar."""
+            return await self.avatar_manager.get_parameter(avatar_id, parameter)
+
+        @server.call_tool()
+        async def send_osc_message(
+            address: str, args: List[Union[bool, float, int, str]]
+        ) -> bool:
+            """Send an OSC message.
+
+            Args:
+                address: OSC address (e.g., "/avatar/parameters/TestParam")
+                args: List of arguments to send with the message
+
+            Returns:
+                True if message was sent successfully
+            """
+            try:
+                # Create OSCMessage and send it
+                from .models import OSCMessage
+
+                message = OSCMessage(address=address, args=args)
+                await self.osc_manager.send_message(message)
+                return True
+            except Exception as e:
+                logger.error(f"Failed to send OSC message: {e}")
+                return False
+
+        @server.call_tool()
+        async def get_osc_statistics() -> Dict[str, Any]:
+            """Get OSC communication statistics."""
+            return self.osc_inspector.get_statistics()
+
+        # System and Help Tools (required by MCP Production Checklist)
+        @server.call_tool()
+        async def get_server_status() -> Dict[str, Any]:
+            """Get comprehensive server status information."""
+            return {
+                "server": "vrchat-mcp",
+                "version": __version__,
+                "status": "running",
+                "interfaces": ["mcp_stdio"],
+                "components": {
+                    "osc_inspector": self.osc_inspector.is_running()
+                    if hasattr(self.osc_inspector, "is_running")
+                    else True,
+                    "avatar_manager": True,
+                    "debug_ui": self.debug_ui is not None,
+                    "interpolation": True,
+                },
+                "config": {
+                    "osc_client": f"{self.config['osc']['client_ip']}:{self.config['osc']['client_port']}",
+                    "osc_server": f"{self.config['osc']['server_ip']}:{self.config['osc']['server_port']}",
+                    "debug_ui_enabled": self.config["debug_ui"]["enabled"],
+                },
+            }
+
+        @server.call_tool()
+        async def get_health_status() -> Dict[str, Any]:
+            """Get health check status (returns 200 OK for HTTP health endpoint)."""
+            return {
+                "status": "healthy",
+                "timestamp": asyncio.get_event_loop().time(),
+                "services": {
+                    "osc": "healthy"
+                    if hasattr(self.osc_inspector, "is_running")
+                    and self.osc_inspector.is_running()
+                    else "unknown",
+                    "avatar_manager": "healthy",
+                    "interpolation": "healthy",
+                },
+            }
+
+        @server.call_tool()
+        async def get_performance_metrics() -> Dict[str, Any]:
+            """Get comprehensive performance metrics for the MCP server.
+
+            Returns:
+                Dictionary containing uptime, request counts, response times, and error rates.
+            """
+            try:
+                metrics = await self.performance_monitor.get_metrics()
+                return {"status": "success", "metrics": metrics}
+            except Exception as e:
+                logger.error(f"Failed to get performance metrics: {e}")
+                return {"status": "error", "error": str(e)}
+
+        @server.call_tool()
+        async def check_rate_limit(client_id: str = "default") -> Dict[str, Any]:
+            """Check current rate limit status for a client.
+
+            Args:
+                client_id: Identifier for the client (default: "default")
+
+            Returns:
+                Dictionary with rate limit status and remaining requests.
+            """
+            try:
+                remaining = await self.rate_limiter.get_remaining_requests(client_id)
+                allowed = await self.rate_limiter.is_allowed(client_id)
+
+                return {
+                    "status": "success",
+                    "client_id": client_id,
+                    "requests_remaining": remaining,
+                    "can_make_request": allowed,
+                    "rate_limit": self.rate_limiter.requests_per_minute,
+                }
+            except Exception as e:
+                logger.error(f"Failed to check rate limit: {e}")
+                return {"status": "error", "error": str(e)}
+
+        @server.call_tool()
+        async def manage_secrets(
+            action: str, key: str = "", value: Any = None, encrypted: bool = False
+        ) -> Dict[str, Any]:
+            """Manage sensitive configuration secrets.
+
+            Args:
+                action: Action to perform ("get", "set", "list", "validate")
+                key: Secret key name (required for get/set)
+                value: Value to set (required for set)
+                encrypted: Whether to encrypt the secret (for set action)
+
+            Returns:
+                Dictionary with operation result
+            """
+            try:
+                if action == "get":
+                    if not key:
+                        return {
+                            "status": "error",
+                            "error": "Key required for get action",
+                        }
+                    secret_value = secrets_manager.get_secret(key, encrypted=encrypted)
+                    return {
+                        "status": "success",
+                        "key": key,
+                        "value": secret_value,
+                        "encrypted": encrypted,
+                    }
+
+                elif action == "set":
+                    if not key or value is None:
+                        return {
+                            "status": "error",
+                            "error": "Key and value required for set action",
+                        }
+                    success = secrets_manager.set_secret(
+                        key, value, encrypted=encrypted
+                    )
+                    return {
+                        "status": "success" if success else "error",
+                        "key": key,
+                        "encrypted": encrypted,
+                    }
+
+                elif action == "list":
+                    secrets = secrets_manager.get_available_secrets()
+                    return {"status": "success", "secrets": secrets}
+
+                elif action == "validate":
+                    validation = secrets_manager.validate_secrets_access()
+                    return {"status": "success", "validation": validation}
+
+                else:
+                    return {"status": "error", "error": f"Unknown action: {action}"}
+
+            except Exception as e:
+                logger.error(f"Failed to manage secrets: {e}")
+                return {"status": "error", "error": str(e)}
+
+        @server.call_tool()
+        async def get_help(topic: str = "general") -> Dict[str, Any]:
+            """Get multilevel help information about VRChat MCP tools and usage.
+
+            Args:
+                topic: Help topic to get information about. Options:
+                      - "general": General usage and available tools
+                      - "tools": Detailed tool descriptions
+                      - "osc": OSC communication help
+                      - "avatars": Avatar management help
+                      - "config": Configuration help
+                      - "api": HTTP API usage
+            """
+            help_content = {
+                "general": {
+                    "description": "VRChat MCP Server provides control over VRChat avatars and assets via OSC protocol",
+                    "interfaces": ["MCP stdio protocol"],
+                    "tools": ["avatar", "parameter", "osc", "system"],
+                    "usage": "Use 'get_help' with specific topic for detailed information",
+                },
+                "tools": {
+                    "avatar_tools": [
+                        "get_avatar_state",
+                        "set_parameter",
+                        "get_parameter",
+                    ],
+                    "osc_tools": ["send_osc_message", "get_osc_statistics"],
+                    "system_tools": [
+                        "get_server_status",
+                        "get_health_status",
+                        "get_help",
+                    ],
+                    "description": "Tools are organized by functionality categories",
+                },
+                "osc": {
+                    "description": "OSC (Open Sound Control) communication with VRChat",
+                    "default_ports": "Client: 9000, Server: 9001",
+                    "addresses": "VRChat parameters start with /avatar/parameters/",
+                    "monitoring": "Use get_osc_statistics() to monitor communication",
+                },
+                "avatars": {
+                    "description": "Avatar state and parameter management",
+                    "loading": "Use set_parameter() to change avatar parameters",
+                    "interpolation": "Parameters support smooth interpolation with easing",
+                    "monitoring": "Use get_avatar_state() to check current values",
+                },
+                "config": {
+                    "description": "Server configuration options",
+                    "osc_settings": "IP addresses and ports for OSC communication",
+                    "debug_ui": "Web-based debug interface (default port 8765)",
+                    "logging": "Configurable logging levels and file output",
+                },
+                "api": {
+                    "description": "HTTP API access via FastAPI",
+                    "note": "HTTP API not available in MCP-only mode",
+                },
+            }
+
+            return help_content.get(
+                topic,
+                {
+                    "error": f"Unknown help topic: {topic}",
+                    "available_topics": list(help_content.keys()),
+                },
+            )
+
+        # Run the server with stdio transport
+        async with stdio_server() as (read_stream, write_stream):
+            await server.run(
+                read_stream,
+                write_stream,
+                server.create_initialization_options()
+            )
+
     def _register_tools(self) -> None:
         """Register all MCP tools on the main instance."""
         self._register_tools_on_instance(self.mcp)
@@ -575,16 +859,9 @@ class VRChatMCP:
             logger.info(f"Starting FastAPI HTTP server on {host}:{port}")
             await self.mcp.run_http_async(host=host, port=port)
         elif mode == "mcp":
-            # For MCP-only mode, create a separate MCP instance without HTTP routes
-            logger.info("Starting MCP stdio server")
-            mcp_stdio = FastMCP(
-                name="vrchat-mcp",
-                instructions="MCP server for VRChat avatar and asset control",
-            )
-            # Register tools on the MCP-only instance
-            self._register_tools_on_instance(mcp_stdio)
-            # Run in stdio mode (no HTTP server)
-            await mcp_stdio.run_stdio_async()
+            # For MCP-only mode, use pure MCP stdio server without FastMCP
+            logger.info("Starting pure MCP stdio server")
+            await self._run_pure_mcp_stdio()
         else:
             raise ValueError(f"Unknown server mode: {mode}")
 
