@@ -259,8 +259,6 @@ class VRChatMCP:
 
     def _register_tools_on_instance(self, mcp_instance) -> None:
         """Register all MCP tools on a specific FastMCP instance."""
-        # API Tools
-        self._register_api_tools_on_instance(mcp_instance)
 
         @mcp_instance.tool()
         async def get_avatar_state(avatar_id: str) -> Dict[str, Any]:
@@ -594,8 +592,8 @@ class VRChatMCP:
         logger.info("VRChat MCP server stopped")
 
 
-# Create a default instance for convenience
-mcp = VRChatMCP()
+# Import and export the FastMCP app (like notepadpp-mcp pattern)
+from .server import app
 
 # Export commonly used types and classes
 __all__ = [
@@ -609,5 +607,5 @@ __all__ = [
     "InterpolationSystem",
     "EasingFunction",
     "DebugUI",
-    "mcp",
+    "app",
 ]
