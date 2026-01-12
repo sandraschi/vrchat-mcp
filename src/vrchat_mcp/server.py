@@ -17,7 +17,7 @@ def main() -> int:
     """Entry point for the VRChat MCP server."""
     try:
         # Create the VRChat MCP instance (this handles all the logic)
-        mcp_instance = VRChatMCP()
+        mcp_instance = VRChatMCP(mode="mcp")
 
         logger.info("Starting VRChat MCP server with dual interface support...")
         logger.info("MCP stdio interface: Available for Claude Desktop integration")

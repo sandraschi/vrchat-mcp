@@ -147,60 +147,67 @@ DEFAULT_CONFIG = {
 class VRChatMCP:
     """Main VRChat MCP server class."""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: Optional[Dict[str, Any]] = None, mode: str = "dual"):
         """Initialize the VRChat MCP server.
 
         Args:
             config: Optional configuration dictionary. If not provided, defaults will be used.
+            mode: Server mode - "dual", "mcp" (stdio), or "fastapi" (HTTP)
         """
         self.config = secrets_manager.load_config_with_secrets(
             {**DEFAULT_CONFIG, **(config or {})}
         )
+        self.mode = mode
 
         # Set up logging
         self._setup_logging()
 
-        # Create the main MCP instance with dual interface support
-        self.mcp = FastMCP(
-            name="vrchat-mcp",
-            instructions="MCP server for VRChat avatar and asset control",
-        )
+        # Only create HTTP-enabled instance for dual/fastapi modes
+        if mode in ["dual", "fastapi"]:
+            # Create the main MCP instance with dual interface support
+            self.mcp = FastMCP(
+                name="vrchat-mcp",
+                instructions="MCP server for VRChat avatar and asset control",
+            )
 
-        # Add FastAPI endpoints for health and docs (required by production checklist)
-        @self.mcp.custom_route("/health", methods=["GET"])
-        async def health_endpoint():
-            """Health check endpoint returning server status."""
-            import time
+            # Add FastAPI endpoints for health and docs (required by production checklist)
+            @self.mcp.custom_route("/health", methods=["GET"])
+            async def health_endpoint():
+                """Health check endpoint returning server status."""
+                import time
 
-            return {
-                "status": "healthy",
-                "server": "vrchat-mcp",
-                "version": __version__,
-                "interfaces": ["mcp_stdio", "fastapi_http"],
-                "timestamp": time.time(),
-            }
+                return {
+                    "status": "healthy",
+                    "server": "vrchat-mcp",
+                    "version": __version__,
+                    "interfaces": ["mcp_stdio", "fastapi_http"],
+                    "timestamp": time.time(),
+                }
 
-        @self.mcp.custom_route("/api/v1/openapi.json", methods=["GET"])
-        async def openapi_json():
-            """OpenAPI schema endpoint."""
-            return {
-                "openapi": "3.1.0",
-                "info": {"title": "VRChat MCP API", "version": __version__},
-                "paths": {},
-            }
+            @self.mcp.custom_route("/api/v1/openapi.json", methods=["GET"])
+            async def openapi_json():
+                """OpenAPI schema endpoint."""
+                return {
+                    "openapi": "3.1.0",
+                    "info": {"title": "VRChat MCP API", "version": __version__},
+                    "paths": {},
+                }
 
-        @self.mcp.custom_route("/api/docs", methods=["GET"])
-        async def api_docs():
-            """OpenAPI documentation endpoint."""
-            return {"message": "OpenAPI docs available at /docs"}
+            @self.mcp.custom_route("/api/docs", methods=["GET"])
+            async def api_docs():
+                """OpenAPI documentation endpoint."""
+                return {"message": "OpenAPI docs available at /docs"}
 
-        # FastMCP 2.12+ provides HTTP interface, but we add custom endpoints
+            # Initialize web interface
+            self.web_interface = WebInterface(self, self.config.get("web", {}))
 
-        # Initialize web interface
-        self.web_interface = WebInterface(self, self.config.get("web", {}))
-
-        # Initialize API Manager
-        self.api_manager = APIManager(self.config)
+            # Initialize API Manager
+            self.api_manager = APIManager(self.config)
+        else:
+            # For MCP-only mode, don't create HTTP components
+            self.mcp = None
+            self.web_interface = None
+            self.api_manager = None
         # Initialize components
         self.osc_inspector = OSCInspector(
             client_ip=self.config["osc"]["client_ip"],
@@ -237,8 +244,9 @@ class VRChatMCP:
                 port=self.config["debug_ui"]["port"],
             )
 
-        # Register tools on the main instance
-        self._register_tools_on_instance(self.mcp)
+        # Register tools on the main instance (only for dual/fastapi modes)
+        if self.mcp is not None:
+            self._register_tools_on_instance(self.mcp)
 
     def _setup_logging(self) -> None:
         """Configure logging based on the configuration."""
@@ -585,7 +593,7 @@ class VRChatMCP:
         logger.info("Stopping VRChat MCP server...")
 
         # Stop the MCP server
-        if hasattr(self, "mcp"):
+        if hasattr(self, "mcp") and self.mcp is not None:
             await self.mcp.stop()
 
         # Stop debug UI if enabled
