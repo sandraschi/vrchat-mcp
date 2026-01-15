@@ -4,27 +4,7 @@ VRChat MCP Server
 FastMCP 2.14.1 compliant MCP server for VRChat avatar and asset control.
 Provides comprehensive OSC-based avatar manipulation and VRChat automation.
 
-CORE CAPABILITIES:
-- Avatar Control: Get/set avatar parameters, load avatars via OSC protocol
-- OSC Communication: Send OSC messages, monitor communication statistics
-- System Management: Health checks, performance metrics, rate limiting
-- Secret Management: Secure configuration value storage and retrieval
-- Help System: Multi-level documentation and usage guidance
-
-USAGE PATTERNS:
-1. Avatar Operations: Use get_avatar_state(), set_parameter(), load_avatar()
-2. OSC Communication: Use send_osc_message(), get_osc_statistics()
-3. System Monitoring: Use get_server_status(), get_performance_metrics()
-4. Configuration: Use manage_secrets() for secure value storage
-5. Help: Use get_help() for detailed usage information
-
-RESPONSE FORMAT:
-All tools return dictionaries with consistent structure:
-- 'success': Boolean indicating operation success
-- 'error': Descriptive error message (when success is False)
-- Additional fields vary by operation (avatar_id, parameter, etc.)
-
-PORTMANTEAU DESIGN:
+The server offers avatar control, OSC communication, system management, secret management, and help system capabilities.
 Tools follow logical grouping for maintainability while preserving full functionality.
 """
 
@@ -54,31 +34,7 @@ logger = logging.getLogger(__name__)
 # Create FastMCP app (like notepadpp-mcp pattern)
 app = FastMCP(
     "VRChat MCP Server",
-    instructions="""You are VRChat MCP Server, a comprehensive automation server for VRChat avatar control and VR social interaction via OSC protocol.
-
-CORE CAPABILITIES:
-- Avatar Control: Manipulate avatar parameters, blend shapes, and animations in real-time
-- OSC Communication: Send and receive OSC messages for VRChat integration
-- System Monitoring: Health checks, performance metrics, and rate limiting
-- Secret Management: Secure storage of API keys and configuration values
-- Help System: Multi-level documentation for all features
-
-USAGE PATTERNS:
-1. Avatar Operations: Use avatar tools to get/set parameters and load avatars
-2. OSC Communication: Use OSC tools to send messages and monitor communication
-3. System Management: Use system tools for health checks and performance monitoring
-4. Configuration: Use secret management for secure value storage
-5. Help: Access comprehensive documentation with get_help()
-
-RESPONSE FORMAT:
-All tools return structured dictionaries:
-- 'success': Boolean operation status
-- 'error': Descriptive error message when applicable
-- Context-specific fields (avatar_id, parameter, statistics, etc.)
-
-PORTMANTEAU DESIGN:
-Tools are logically grouped for discoverability while maintaining comprehensive functionality.
-""",
+    instructions="You are VRChat MCP Server, a comprehensive automation server for VRChat avatar control and VR social interaction via OSC protocol. The server offers avatar control, OSC communication, system management, secret management, and help system capabilities. Tools are logically grouped for discoverability while maintaining comprehensive functionality.",
 )
 
 # Initialize core components

@@ -161,48 +161,6 @@ def tool(
     The decorator supports both simple and complex tool definitions, with automatic
     extraction of parameter information from type hints and docstrings.
 
-    Example:
-        ```python
-        @tool(
-            name="example_tool",
-            category="Examples",
-            description="An example tool that demonstrates the decorator usage.",
-            args={
-                "param1": {
-                    "type": "string",
-                    "description": "First parameter",
-                    "required": True
-                },
-                "param2": {
-                    "type": "integer",
-                    "description": "Second parameter with default",
-                    "default": 42,
-                    "required": False
-                }
-            },
-            returns={
-                "type": "object",
-                "description": "Result of the operation",
-                "schema": {
-                    "success": {"type": "boolean"},
-                    "message": {"type": "string"}
-                }
-            },
-            examples=[
-                {
-                    "description": "Basic usage",
-                    "code": "example_tool(param1='test', param2=123)",
-                    "returns": "{'success': True, 'message': 'Operation completed'}"
-                }
-            ],
-            requires_auth=True,
-            rate_limit={"calls": 10, "interval": 60}
-        )
-        def my_tool(param1: str, param2: int = 42) -> Dict[str, Any]:
-            # Tool implementation here
-            return {"success": True, "message": f"Processed {param1} and {param2}"}
-        ```
-
     Args:
         name: The name of the tool. If not provided, the function name will be used.
         description: A short description of what the tool does. If not provided,
