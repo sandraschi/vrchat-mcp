@@ -14,6 +14,8 @@ src/vrchat_mcp/osc.py
 src/vrchat_mcp/osc_inspector.py
 src/vrchat_mcp/secrets.py
 src/vrchat_mcp/server.py
+src/vrchat_mcp/transport.py
+src/vrchat_mcp/web_interface.py
 src/vrchat_mcp/websocket_server.py
 src/vrchat_mcp.egg-info/PKG-INFO
 src/vrchat_mcp.egg-info/SOURCES.txt

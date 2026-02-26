@@ -26,7 +26,7 @@ pip install vrchat-mcp
 # Or install from source
 git clone https://github.com/sandraschi/vrchat-mcp.git
 cd vrchat-mcp
-pip install -e .
+uv pip install -e .
 ```
 
 ### 2. Configure Claude Desktop
@@ -68,7 +68,7 @@ In Claude Desktop, you can now use natural language commands like:
   - [Using the @event_listener Decorator](#using-the-event_listener-decorator)
   - [Best Practices](#best-practices)
 - [VRChat Setup](#vrchat-setup)
-- [DXT Packaging](#dxt-packaging)
+- [Packaging & Distribution](#-packaging--distribution)
 - [Development](#development)
 - [License](#license)
 
@@ -82,7 +82,6 @@ In Claude Desktop, you can now use natural language commands like:
 - **✅ Help System** - Built-in documentation for all registered tools
 - **✅ Modular Architecture** - Clean tool organization in category subdirectories
 - **✅ Production Testing** - Comprehensive unit, integration, and API testing
-- **✅ DXT Packaging** - Ready for Claude Desktop Extensions deployment
 
 ## Planned Features
 
@@ -114,24 +113,28 @@ In Claude Desktop, you can now use natural language commands like:
 | **Performance Monitoring** | ❌ Planned | Advanced metrics and comprehensive rate limiting |
 | **GitHub Infrastructure** | ⚠️ Partial | Repository structure ready, CI/CD pending |
 
-## Installation
+## 🚀 Installation
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/sandraschi/vrchat-mcp.git
-   cd vrchat-mcp
-   ```
+### Prerequisites
+- [uv](https://docs.astral.sh/uv/) installed (RECOMMENDED)
+- Python 3.12+
 
-2. Install dependencies:
-   ```bash
-   pip install -e .
-   ```
+### 📦 Quick Start
+Run immediately via `uvx`:
+```bash
+uvx vrchat-mcp
+```
 
-3. Install development dependencies (optional):
-   ```bash
-   pip install -e ".[dev]"
-   ```
-
+### 🎯 Claude Desktop Integration
+Add to your `claude_desktop_config.json`:
+```json
+"mcpServers": {
+  "vrchat-mcp": {
+    "command": "uv",
+    "args": ["--directory", "D:/Dev/repos/vrchat-mcp", "run", "vrchat-mcp"]
+  }
+}
+```
 ## Configuration
 
 Create a `.env` file in the project root with your configuration:
@@ -367,20 +370,16 @@ async def on_player_joined(self, event_data: Dict[str, Any]) -> None:
    - Update version numbers when making changes
    - Document breaking changes
 
-## DXT Packaging
+## 📦 Packaging & Distribution
 
-The project includes validation and packaging scripts for Claude Desktop Extensions (DXT):
+This repository is SOTA 2026 compliant and uses the officially validated `@anthropic-ai/mcpb` workflow for distribution.
 
+### Pack Extension
+To generate a `.mcpb` distribution bundle with complete source code and automated build exclusions:
 ```bash
-# Validate the MCP server
-python scripts/validate_and_pack.ps1
-
-# Or use the individual commands:
-mcpb validate
-mcpb pack
+# SOTA 2026 standard pack command
+mcpb pack . dist/vrchat-mcp.mcpb
 ```
-
-This creates a package ready for Claude Desktop Extensions. See [DXT Building Guide](docs/DXT_BUILDING_GUIDE.md) for detailed instructions.
 
 ## Documentation
 
@@ -406,3 +405,15 @@ For support, please open an issue on the [GitHub repository](https://github.com/
 ---
 
 **🎯 Production Ready Core**: This VRChat MCP server provides a solid foundation with reliable MCP/FastAPI dual interface support, comprehensive testing, and basic VRChat integration. Ready for integration with Claude Desktop. Advanced features (intelligent NPCs, advanced avatar control) are planned for future releases.
+
+
+## 🌐 Webapp Dashboard
+
+This MCP server includes a free, premium web interface for monitoring and control.
+By default, the web dashboard runs on port **10712**.
+*(Assigned ports: **10712** (Web dashboard))*
+
+To start the webapp:
+1. Navigate to the `webapp` (or `web`, `frontend`) directory.
+2. Run `start.bat` (Windows) or `./start.ps1` (PowerShell).
+3. Open `http://localhost:10712` in your browser.

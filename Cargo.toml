@@ -1,5 +1,5 @@
 [package]
-name = "VRChatSocialVR"
+name = "vrchat_social_vr"
 version = "0.1.0"
 edition = "2021"
 authors = ["Sandra <sandraschipal@hotmail.com>"]

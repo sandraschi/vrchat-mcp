@@ -16,6 +16,7 @@ from typing import Any, Dict, Optional
 from fastmcp import FastMCP
 
 # Import components
+from .transport import run_server, run_server_async
 from .osc_inspector import OSCInspector
 from .tools.avatar.tools import AvatarManager
 from .osc import OSCManager
@@ -353,12 +354,12 @@ async def main() -> None:
             logger.warning(f"Failed to start OSC inspector: {e}")
 
     # Run the MCP server
-    await app.run_stdio_async()
+    await run_server_async(app, server_name="VRChat MCP Server")
 
 
 def run() -> None:
     """Synchronous entry point for compatibility."""
-    asyncio.run(main())
+    await run_server_async(asyncio, server_name="VRChat MCP Server"))
 
 
 if __name__ == "__main__":
