@@ -20,7 +20,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "loguru>=0.7.0",
     "httpx>=0.24.0",
-    "ruff>=0.15.2",
+    "ruff>=0.15.10",
 ]
 
 [project.optional-dependencies]
