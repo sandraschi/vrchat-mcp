@@ -18,7 +18,7 @@ dependencies = [
     "fastapi>=0.95.0",
     "uvicorn>=0.21.0",
     "python-dotenv>=1.0.0",
-    "loguru>=0.7.0",
+    "loguru>=0.7.3",
     "httpx>=0.24.0",
     "ruff>=0.15.2",
 ]
