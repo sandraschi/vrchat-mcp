@@ -1,0 +1,24 @@
+{
+  "dxt_version": "0.1",
+  "name": "vrchat-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for controlling VRChat avatars and assets with FastMCP 2.12+",
+  "author": {
+    "name": "Sandra Schi"
+  },
+  "license": "MIT",
+  "server": {
+    "type": "python",
+    "entry_point": "src/vrchat_mcp/server.py",
+    "mcp_config": {
+      "command": "python",
+      "args": [
+        "${__dirname}/src/vrchat_mcp/server.py"
+      ],
+      "env": {
+        "PYTHONPATH": "${__dirname}/src",
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}

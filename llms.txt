@@ -1,0 +1,27 @@
+# VRChat MCP: SOTA Industrial v14.1.0
+
+Industrialized FastMCP 3.2.0 control plane for VRChat avatar orchestration, protocol telemetry, and world interaction.
+
+## Core Architecture
+- **Portmanteau Protocol**: High-utility tools consolidate OSC, REST API, and Websocket logic.
+- **REST Integration**: Official VRChat Web API support for avatar/world metadata and economy tracking.
+- **Real-time Pipeline**: Websocket-based event monitoring for notifications and social telemetry.
+- **Protocol Safety**: Proactive 60s caching and atomic OSC simulation.
+
+## Unified Portmanteau Tools
+- `manage_avatar`: Character state and industrial parameter management.
+- `manage_osc`: Low-level protocol traffic and traffic statistics.
+- `manage_world`: REST-backed world discovery and instance telemetry.
+- `manage_economy`: Creator Economy tracking (Credits, Udon products).
+- `manage_input`: Direct simulation of avatar motion and chatbox communication.
+- `manage_system`: Health, performance metrics (RPS/Latency), and 2FA authentication.
+
+## Technical Standards
+- **Fleet Port**: 10795 (Backend), 10796 (Dashboard).
+- **Compliance**: SOTA v14.1.0 Hardenings, Zero-STDOUT, industrial JSON-RPC logging.
+- **Environment**: VRCHAT_USERNAME, VRCHAT_PASSWORD, OSC_SEND_PORT (9000), OSC_RECV_PORT (9001).
+
+## Operational Notes
+- **2FA**: Handled via `manage_system(operation="auth_2fa")`.
+- **Caching**: 60s TTL enforced on world/economy endpoints.
+- **Simulation**: OSC move/look inputs require float ranges [-1.0, 1.0].

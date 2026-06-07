@@ -1,0 +1,47 @@
+{
+  "manifest_version": "0.2",
+  "name": "vrchat-mcp",
+  "version": "14.1.0",
+  "description": "VRChat avatar and world control via OSC protocol - SOTA v14.1.0 Industrial Control Plane",
+  "author": {
+    "name": "Sandra",
+    "email": "dev@vrchat-mcp.example.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/sandraschi/vrchat-mcp",
+  "server": {
+    "type": "python",
+    "entry_point": "src/vrchat_mcp/server.py",
+    "mcp_config": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "vrchat_mcp.server"],
+      "env": {
+        "PYTHONPATH": ".",
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "manage_avatar",
+      "description": "Unified VRChat avatar management (express, config, sync, status)"
+    },
+    {
+      "name": "manage_osc",
+      "description": "Unified VRChat OSC control (set, get, trigger, stats)"
+    },
+    {
+      "name": "manage_system",
+      "description": "Unified VRChat system operations (status, health, metrics, reset)"
+    }
+  ],
+  "keywords": [
+    "vrchat",
+    "osc",
+    "avatar",
+    "automation",
+    "fastmcp",
+    "sota"
+  ]
+}
+

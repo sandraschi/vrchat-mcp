@@ -1,0 +1,84 @@
+{
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": ["sandraschi"],
+  "name": "vrchat-mcp",
+  "description": "FastMCP 2.14.1 server for controlling VRChat avatars and assets via OSC protocol. MCP stdio transport only.",
+  "type": "mcp_server",
+  "status": "alpha",
+  "framework": "FastMCP 2.12+",
+  "tools": 8,
+  "transport": ["stdio"],
+  "keywords": [
+    "vrchat",
+    "osc",
+    "avatar-control",
+    "vr",
+    "social-vr",
+    "mcp-server",
+    "fastmcp",
+    "claude-desktop"
+  ],
+  "features": {
+    "osc_control": {
+      "enabled": true,
+      "protocol": "OSC",
+      "note": "Primary control method for VRChat"
+    },
+    "avatar_control": {
+      "enabled": true
+    },
+    "asset_management": {
+      "enabled": true
+    },
+    "mcp_stdio": {
+      "enabled": true,
+      "note": "MCP stdio protocol for Cursor integration"
+    }
+  },
+  "mcpServers": {
+    "vrchat-mcp": {
+      "command": "python",
+      "args": ["-m", "vrchat_mcp.server"],
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+      "description": "VRChat avatar and asset control via OSC protocol",
+      "capabilities": {
+        "tools": {
+          "enabled": true
+        },
+        "resources": {
+          "enabled": false
+        },
+        "prompts": {
+          "enabled": false
+        }
+      },
+      "timeout": {
+        "initialize": 30000,
+        "message": 60000
+      },
+      "metadata": {
+        "version": "0.1.0",
+        "author": "Sandra Schi",
+        "homepage": "https://github.com/sandraschi/vrchat-mcp",
+        "license": "MIT",
+        "tags": [
+          "vrchat",
+          "osc",
+          "avatar-control",
+          "vr",
+          "social-vr",
+          "mcp-server",
+          "fastmcp"
+        ],
+        "categories": [
+          "Virtual Reality",
+          "Automation",
+          "Gaming"
+        ]
+      }
+    }
+  }
+}
+

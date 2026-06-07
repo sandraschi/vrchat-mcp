@@ -1,0 +1,96 @@
+{
+  "manifest_version": "0.2",
+  "name": "vrchat-mcp",
+  "version": "1.0.0",
+  "description": "VRChat avatar and world control via OSC protocol - Real-time avatar parameter manipulation, world interactions, and social VR automation with Austrian precision",
+  "author": {
+    "name": "Sandra",
+    "email": "dev@vrchat-mcp.example.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/sandraschi/vrchat-mcp",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sandraschi/vrchat-mcp"
+  },
+  "server": {
+    "type": "python",
+    "entry_point": "server/server.py",
+    "mcp_config": {
+      "command": "python",
+      "args": ["server/server.py"],
+      "env": {
+        "PYTHONPATH": "${PWD}",
+        "PYTHONUNBUFFERED": "1",
+        "VRCHAT_OSC_RECEIVE_PORT": "${user_config.osc_receive_port}",
+        "VRCHAT_OSC_SEND_PORT": "${user_config.osc_send_port}"
+      }
+    }
+  },
+  "user_config": {
+    "osc_receive_port": {
+      "type": "string",
+      "title": "OSC Receive Port",
+      "description": "Port to receive OSC messages from VRChat",
+      "default": "9001"
+    },
+    "osc_send_port": {
+      "type": "string",
+      "title": "OSC Send Port",
+      "description": "Port to send OSC messages to VRChat",
+      "default": "9000"
+    }
+  },
+  "tools": [
+    {
+      "name": "avatar_parameter_set",
+      "description": "Set VRChat avatar parameter values"
+    },
+    {
+      "name": "avatar_parameter_get",
+      "description": "Get VRChat avatar parameter values"
+    },
+    {
+      "name": "avatar_expression_trigger",
+      "description": "Trigger avatar facial expressions and gestures"
+    },
+    {
+      "name": "world_trigger_activate",
+      "description": "Activate world objects and events"
+    },
+    {
+      "name": "chatbox_send_message",
+      "description": "Send messages to VRChat chatbox"
+    },
+    {
+      "name": "avatar_state_monitor",
+      "description": "Monitor avatar position and state"
+    },
+    {
+      "name": "input_simulate",
+      "description": "Simulate VRChat input actions"
+    },
+    {
+      "name": "osc_connection_test",
+      "description": "Test OSC connection to VRChat"
+    }
+  ],
+  "compatibility": {
+    "platforms": ["win32", "darwin", "linux"],
+    "python": ">=3.8"
+  },
+  "keywords": [
+    "vrchat",
+    "osc",
+    "avatar",
+    "virtual-reality",
+    "social-vr",
+    "automation",
+    "metaverse",
+    "real-time",
+    "fastmcp",
+    "claude-desktop",
+    "austria"
+  ]
+}
+

@@ -1,0 +1,36 @@
+{
+    "name": "vrchat-mcp",
+    "version": "14.1.0",
+    "type": "server",
+    "runtime": "python",
+    "entry_point": "src/vrchat_mcp/server.py",
+    "dependencies": [
+        "fastmcp>=3.2.0"
+    ],
+    "build": {
+        "include": [
+            "src/**/*",
+            "README.md",
+            "LICENSE",
+            "mcpb/manifest.json"
+        ],
+        "exclude": [
+            "tests/",
+            ".git/",
+            "__pycache__/",
+            "*.pyc",
+            ".venv/",
+            "dist/",
+            "build/",
+            "target/",
+            "docs/",
+            "scripts/",
+            "*.dxt"
+        ]
+    },
+    "scripts": {
+        "build": "npx mcpb build",
+        "pack": "npx mcpb pack . dist/vrchat-mcp.mcpb",
+        "test": "uv run python -m pytest"
+    }
+}

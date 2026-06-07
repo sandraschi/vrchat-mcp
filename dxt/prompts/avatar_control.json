@@ -1,0 +1,60 @@
+{
+  "name": "avatar_parameter_control",
+  "description": "Control VRChat avatar parameters with smooth interpolation",
+  "version": "1.0.0",
+  "parameters": {
+    "avatar_id": {
+      "type": "string",
+      "description": "ID of the avatar to control",
+      "required": true
+    },
+    "parameter_name": {
+      "type": "string",
+      "description": "Name of the parameter to set (e.g., VRCEmote, VRCFaceBlendH)",
+      "required": true
+    },
+    "value": {
+      "type": "number",
+      "description": "Value to set for the parameter (0.0 to 1.0 for most parameters)",
+      "required": true
+    },
+    "interpolate": {
+      "type": "boolean",
+      "description": "Whether to smoothly interpolate to the new value",
+      "default": true
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration of interpolation in seconds",
+      "default": 0.5
+    },
+    "easing": {
+      "type": "string",
+      "enum": ["linear", "ease_in", "ease_out", "ease_in_out"],
+      "description": "Easing function for interpolation",
+      "default": "ease_out"
+    }
+  },
+  "template": "Control avatar {avatar_id} by setting {parameter_name} to {value}. Use {interpolate} interpolation over {duration} seconds with {easing} easing.",
+  "examples": [
+    {
+      "input": {
+        "avatar_id": "my_avatar",
+        "parameter_name": "VRCEmote",
+        "value": 1,
+        "interpolate": true,
+        "duration": 2.0,
+        "easing": "ease_out"
+      },
+      "output": "Set the VRCEmote parameter on avatar my_avatar to 1 with smooth interpolation over 2.0 seconds using ease_out easing."
+    },
+    {
+      "input": {
+        "avatar_id": "player_avatar",
+        "parameter_name": "VRCFaceBlendH",
+        "value": 0.8
+      },
+      "output": "Set the VRCFaceBlendH parameter on avatar player_avatar to 0.8 with smooth interpolation over 0.5 seconds using ease_out easing."
+    }
+  ]
+}

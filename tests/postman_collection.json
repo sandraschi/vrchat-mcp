@@ -1,0 +1,561 @@
+{
+  "info": {
+    "name": "VRChat MCP Server API Tests",
+    "description": "Postman collection for testing VRChat MCP server FastAPI endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "test_avatar_id",
+      "value": "test_avatar_123",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Get Health Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": ["{{base_url}}"],
+              "path": ["health"]
+            },
+            "description": "Check server health status - should return 200 OK with JSON status"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API Documentation",
+      "item": [
+        {
+          "name": "OpenAPI Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/docs",
+              "host": ["{{base_url}}"],
+              "path": ["api", "docs"]
+            },
+            "description": "Access OpenAPI/Swagger documentation for all endpoints"
+          },
+          "response": []
+        },
+        {
+          "name": "OpenAPI Schema",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/openapi.json",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "openapi.json"]
+            },
+            "description": "Get OpenAPI schema in JSON format"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System Tools",
+      "item": [
+        {
+          "name": "Get Server Status",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/get_server_status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "get_server_status"]
+            },
+            "description": "Get comprehensive server status information"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Health Status (Tool)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/get_health_status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "get_health_status"]
+            },
+            "description": "Get health status via tool endpoint"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Help - General",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"topic\": \"general\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/get_help",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "get_help"]
+            },
+            "description": "Get general help information"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Help - Tools",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"topic\": \"tools\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/get_help",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "get_help"]
+            },
+            "description": "Get information about available tools"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Help - OSC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"topic\": \"osc\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/get_help",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "get_help"]
+            },
+            "description": "Get OSC communication help"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Avatar Management",
+      "item": [
+        {
+          "name": "Get Avatar State",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"avatar_id\": \"{{test_avatar_id}}\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/get_avatar_state",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "get_avatar_state"]
+            },
+            "description": "Get current state of a specific avatar"
+          },
+          "response": []
+        },
+        {
+          "name": "Load Avatar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"avatar_id\": \"{{test_avatar_id}}\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/load_avatar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "load_avatar"]
+            },
+            "description": "Load an avatar by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Set Parameter - Simple",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"avatar_id\": \"{{test_avatar_id}}\", \"parameter\": \"TestParameter\", \"value\": 0.75}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/set_parameter",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "set_parameter"]
+            },
+            "description": "Set a parameter value for an avatar"
+          },
+          "response": []
+        },
+        {
+          "name": "Set Parameter - With Interpolation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"avatar_id\": \"{{test_avatar_id}}\", \"parameter\": \"VRCFaceBlendH\", \"value\": 0.8, \"interpolate\": true, \"duration\": 2.0, \"easing\": \"ease_out\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/set_parameter",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "set_parameter"]
+            },
+            "description": "Set a parameter with smooth interpolation and easing"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Parameter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"avatar_id\": \"{{test_avatar_id}}\", \"parameter\": \"TestParameter\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/get_parameter",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "get_parameter"]
+            },
+            "description": "Get a parameter value for an avatar"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "OSC Communication",
+      "item": [
+        {
+          "name": "Send OSC Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"address\": \"/avatar/parameters/TestOSC\", \"args\": [1.0]}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/send_osc_message",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "send_osc_message"]
+            },
+            "description": "Send a custom OSC message"
+          },
+          "response": []
+        },
+        {
+          "name": "Get OSC Statistics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/get_osc_statistics",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "get_osc_statistics"]
+            },
+            "description": "Get OSC communication statistics"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Error Handling",
+      "item": [
+        {
+          "name": "Invalid Tool Name",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/nonexistent_tool",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "nonexistent_tool"]
+            },
+            "description": "Test error handling for non-existent tool (should return 404)"
+          },
+          "response": []
+        },
+        {
+          "name": "Missing Required Parameters",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/set_parameter",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "set_parameter"]
+            },
+            "description": "Test error handling for missing required parameters (should return 400)"
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Parameter Types",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"avatar_id\": \"test\", \"parameter\": \"TestParam\", \"value\": \"invalid_number\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/set_parameter",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "set_parameter"]
+            },
+            "description": "Test error handling for invalid parameter types (should return 400)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Load Testing",
+      "item": [
+        {
+          "name": "Rapid Parameter Updates",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"avatar_id\": \"{{test_avatar_id}}\", \"parameter\": \"LoadTestParam\", \"value\": {{ $randomInt }}}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/set_parameter",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "set_parameter"]
+            },
+            "description": "Rapid parameter updates for load testing (use with Postman Runner)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set dynamic timestamp for unique test data",
+          "pm.globals.set(\"timestamp\", new Date().getTime());",
+          "",
+          "// Set random test values",
+          "pm.globals.set(\"random_value\", Math.random());",
+          "pm.globals.set(\"random_int\", Math.floor(Math.random() * 100));"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Common test assertions",
+          "pm.test(\"Status code is not 5xx\", function () {",
+          "    pm.response.to.not.be.serverError;",
+          "});",
+          "",
+          "pm.test(\"Response time is less than 2000ms\", function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "pm.test(\"Response has proper content type\", function () {",
+          "    var contentType = pm.response.headers.get('Content-Type');",
+          "    if (contentType) {",
+          "        pm.expect(contentType).to.include('application/json');",
+          "    }",
+          "});",
+          "",
+          "// Specific tests for different endpoints",
+          "var url = pm.request.url.toString();",
+          "",
+          "if (url.includes('/health')) {",
+          "    pm.test(\"Health endpoint returns 200\", function () {",
+          "        pm.response.to.have.status(200);",
+          "    });",
+          "    ",
+          "    pm.test(\"Health response has status field\", function () {",
+          "        var jsonData = pm.response.json();",
+          "        pm.expect(jsonData).to.have.property('status');",
+          "    });",
+          "}",
+          "",
+          "if (url.includes('/api/v1/')) {",
+          "    pm.test(\"API endpoint returns valid JSON\", function () {",
+          "        pm.response.to.be.json;",
+          "    });",
+          "}",
+          "",
+          "// Error handling tests",
+          "if (url.includes('nonexistent_tool')) {",
+          "    pm.test(\"Non-existent tool returns 404\", function () {",
+          "        pm.response.to.have.status(404);",
+          "    });",
+          "}",
+          "",
+          "if (url.includes('set_parameter') && pm.request.body.raw.includes('invalid_number')) {",
+          "    pm.test(\"Invalid parameter returns 400\", function () {",
+          "        pm.response.to.have.status(400);",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "timestamp",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "random_value",
+      "value": "",
+      "type": "any"
+    },
+    {
+      "key": "random_int",
+      "value": "",
+      "type": "any"
+    }
+  ]
+}

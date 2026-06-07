@@ -1,0 +1,138 @@
+/* VRChat MCP Debugger - Custom Styles */
+
+/* Base Styles */
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+}
+
+/* Message List */
+#message-list {
+    font-family: 'Fira Code', 'Courier New', monospace;
+    font-size: 0.875rem;
+}
+
+.message-row {
+    transition: background-color 0.1s ease;
+}
+
+.message-row:hover {
+    background-color: #f9fafb;
+}
+
+.message-row.incoming {
+    background-color: #f0f9ff;
+}
+
+.message-row.outgoing {
+    background-color: #f0fdf4;
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-block;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 9999px;
+    margin-right: 0.5rem;
+}
+
+.status-connected {
+    background-color: #10b981; /* Green */
+}
+
+.status-disconnected {
+    background-color: #ef4444; /* Red */
+}
+
+/* Buttons */
+.btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors;
+}
+
+.btn-primary {
+    @apply bg-indigo-600 text-white hover:bg-indigo-700;
+}
+
+.btn-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300;
+}
+
+/* Inputs */
+.input {
+    @apply w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-gray-400 rounded-full hover:bg-gray-500;
+}
+
+/* Animations */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        @apply px-2;
+    }
+    
+    #message-list {
+        font-size: 0.75rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        @apply bg-gray-900 text-gray-100;
+    }
+    
+    .message-row {
+        @apply border-gray-700;
+    }
+    
+    .message-row:hover {
+        @apply bg-gray-800;
+    }
+    
+    .message-row.incoming {
+        @apply bg-blue-900 bg-opacity-30;
+    }
+    
+    .message-row.outgoing {
+        @apply bg-green-900 bg-opacity-30;
+    }
+    
+    .input {
+        @apply bg-gray-800 border-gray-700 text-white;
+    }
+    
+    .btn-secondary {
+        @apply bg-gray-700 text-gray-200 hover:bg-gray-600;
+    }
+    
+    ::-webkit-scrollbar-track {
+        @apply bg-gray-800;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        @apply bg-gray-600 hover:bg-gray-500;
+    }
+}

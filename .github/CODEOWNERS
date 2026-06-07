@@ -1,0 +1,32 @@
+# This file defines who owns different parts of the codebase
+# and who should review changes to those parts.
+
+# Global owners - review all changes
+* @your-username  # Replace with actual maintainers
+
+# Core server and MCP integration
+/src/vrchat_mcp/server.py @your-username
+/src/vrchat_mcp/__init__.py @your-username
+
+# OSC communication
+/src/vrchat_mcp/tools/osc/ @your-username
+
+# Avatar management
+/src/vrchat_mcp/tools/avatar/ @your-username
+
+# NPC functionality
+/src/vrchat_mcp/tools/npc/ @your-username
+
+# Plugins
+/src/vrchat_mcp/plugins/ @your-username
+
+# Testing infrastructure
+/tests/ @your-username
+
+# Documentation
+/docs/ @your-username
+*.md @your-username
+
+# CI/CD and infrastructure
+/.github/ @your-username
+
