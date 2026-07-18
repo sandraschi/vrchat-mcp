@@ -12,6 +12,13 @@
 
 **Unified Control Plane for VRChat Avatar Orchestration & Protocol Telemetry.**
 
+> ⚠️ **This server is runtime control only — it does not build worlds.**
+> `manage_world` is metadata/search (REST), not content authoring. For the
+> actual Unity/VRChat SDK build pipeline (scene assembly, asset import,
+> validation) using `unity3d-mcp`, and an honest account of what's
+> automatable vs. still manual (Udon scripting, world publish), see
+> **[docs/Building_VRChat_Worlds_With_Unity3D_MCP.md](docs/Building_VRChat_Worlds_With_Unity3D_MCP.md)**.
+
 ## Quick Start
 
 ```powershell
