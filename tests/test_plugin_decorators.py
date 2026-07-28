@@ -9,7 +9,7 @@ from vrchat_mcp.plugins import Plugin, event_listener, tool
 
 
 # Test plugin class that uses the decorators
-class TestPlugin(Plugin):
+class SamplePlugin(Plugin):
     """Test plugin for testing decorators."""
 
     @property
@@ -60,11 +60,17 @@ class TestPlugin(Plugin):
         """
         self.last_event = event_data
 
+    async def on_load(self, mcp: Any) -> None:
+        pass
+
+    async def on_unload(self) -> None:
+        pass
+
 
 # Tests
 def test_tool_decorator():
     """Test that the @tool decorator correctly sets up tool metadata."""
-    plugin = TestPlugin()
+    plugin = SamplePlugin()
 
     # Check that the method is marked as a tool
     assert hasattr(plugin.test_tool, "_is_tool")
@@ -105,7 +111,7 @@ def test_tool_decorator():
 
 def test_tool_invocation():
     """Test that the tool can be called normally."""
-    plugin = TestPlugin()
+    plugin = SamplePlugin()
     result = plugin.test_tool("test_value", 123)
     assert result["success"] is True
     assert "test_value" in result["message"]
@@ -120,7 +126,7 @@ def test_tool_invocation():
 @pytest.mark.asyncio
 async def test_event_listener():
     """Test that the @event_listener decorator works correctly."""
-    plugin = TestPlugin()
+    plugin = SamplePlugin()
 
     # Check that the method is marked as an event listener
     assert hasattr(plugin.on_test_event, "_event_listeners")
@@ -142,18 +148,17 @@ async def test_event_listener():
 
 def test_tool_signature_preservation():
     """Test that the function signature is preserved by the @tool decorator."""
-    plugin = TestPlugin()
+    plugin = SamplePlugin()
 
     # Get the signature of the decorated method
     sig = inspect.signature(plugin.test_tool)
     params = list(sig.parameters.values())
 
     # Check that the signature includes 'self' and the parameters
-    assert len(params) == 3  # self, param1, param2
-    assert params[0].name == "self"
-    assert params[1].name == "param1"
-    assert params[2].name == "param2"
-    assert params[2].default == 42  # Default value is preserved
+    assert len(params) == 2
+    assert params[0].name == "param1"
+    assert params[1].name == "param2"
+    assert params[1].default == 42
 
     # Check return type annotation
     assert sig.return_annotation == dict[str, Any]

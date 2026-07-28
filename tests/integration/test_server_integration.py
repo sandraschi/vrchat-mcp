@@ -13,6 +13,8 @@ import time
 import pytest
 import requests
 
+pytestmark = pytest.mark.integration
+
 # Reduce log noise during testing
 logging.getLogger().setLevel(logging.WARNING)
 

@@ -1,15 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Layout } from '@/components/layout/Layout';
-
-import { Dashboard } from '@/pages/dashboard';
-import { Avatars } from '@/pages/avatars';
-import { OSC } from '@/pages/osc';
-import { Docs } from '@/pages/docs';
-import { Settings } from '@/pages/settings';
-import { Tools } from '@/pages/tools';
-import { Status } from '@/pages/status';
-import { Apps } from '@/pages/apps';
-import { Help } from '@/pages/help';
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { Layout } from "@/components/layout/Layout";
+import { Apps } from "@/pages/apps";
+import { Avatars } from "@/pages/avatars";
+import { Dashboard } from "@/pages/dashboard";
+import { Docs } from "@/pages/docs";
+import { Help } from "@/pages/help";
+import { OSC } from "@/pages/osc";
+import { Settings } from "@/pages/settings";
+import { Status } from "@/pages/status";
+import { Tools } from "@/pages/tools";
 
 function App() {
   return (
@@ -28,7 +27,7 @@ function App() {
         </Routes>
       </Layout>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;

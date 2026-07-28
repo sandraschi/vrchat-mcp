@@ -230,13 +230,17 @@ def tool(
         # Start with explicitly provided args
         if args:
             for arg_name, arg_info in args.items():
-                final_args[arg_name] = {
+                entry: dict[str, Any] = {
                     "type": arg_info.get("type", "string"),
                     "description": arg_info.get("description", param_docs.get(arg_name, "")),
                     "required": arg_info.get("required", True),
                     "default": arg_info.get("default"),
                     "example": arg_info.get("example"),
                 }
+                for key, value in arg_info.items():
+                    if key not in entry:
+                        entry[key] = value
+                final_args[arg_name] = entry
 
         # Add parameters from type hints if not already defined
         for param_name, param in sig.parameters.items():
@@ -270,7 +274,7 @@ def tool(
             if "Raises:" in returns_section:
                 returns_section = returns_section.split("Raises:")[0]
             returns_desc = returns_section.strip()
-            if returns_desc:
+            if returns_desc and not final_returns.get("description"):
                 if not final_returns:
                     final_returns = {"type": "any"}
                 final_returns["description"] = returns_desc

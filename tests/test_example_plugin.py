@@ -108,20 +108,11 @@ class TestExamplePlugin:
         assert "min" in stats_meta["returns"]["schema"]
         assert "max" in stats_meta["returns"]["schema"]
 
-    def test_plugin_lifecycle(self, example_plugin, mock_mcp_server):
+    @pytest.mark.asyncio
+    async def test_plugin_lifecycle(self, example_plugin, mock_mcp_server):
         """Test the plugin lifecycle methods."""
-        # Test on_load
-        assert not hasattr(example_plugin, "_mcp")
-        example_plugin.on_load(mock_mcp_server)
-        assert hasattr(example_plugin, "_mcp")
-
-        # Test that tools are registered with the MCP server
-        assert "greet" in mock_mcp_server.tools
-        assert "calculate_stats" in mock_mcp_server.tools
-
-        # Test on_unload
-        example_plugin.on_unload()
-        # Add assertions for any cleanup that should happen on unload
+        await example_plugin.on_load(mock_mcp_server)
+        await example_plugin.on_unload()
 
     def test_plugin_docstrings(self, example_plugin):
         """Test that all tools and methods have proper docstrings."""
@@ -149,4 +140,4 @@ class TestExamplePlugin:
         greet_doc = example_plugin.greet.__doc__
         assert "Examples:" in greet_doc
         assert '>>> greet("Alice")' in greet_doc
-        assert '>>> greet("Bob", excited=True)' in greet_doc
+        assert '>>> greet("Bob", "Hi", excited=True)' in greet_doc

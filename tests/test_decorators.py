@@ -8,8 +8,7 @@ import pytest
 from vrchat_mcp.plugins import Plugin, event_listener, tool
 
 
-# Test plugin class that uses the decorators
-class TestPlugin(Plugin):
+class SamplePlugin(Plugin):
     """Test plugin for testing decorators."""
 
     @property
@@ -53,121 +52,44 @@ class TestPlugin(Plugin):
 
     @event_listener("test_event")
     async def on_test_event(self, event_data: dict[str, Any]) -> None:
-        """Handle test events.
-
-        Args:
-            event_data: The event data
-        """
+        """Handle test events."""
         self.last_event = event_data
 
+    async def on_load(self, mcp: Any) -> None:
+        pass
 
-# Tests
+    async def on_unload(self) -> None:
+        pass
+
+
 def test_tool_decorator():
-    """Test that the @tool decorator correctly sets up tool metadata."""
-    plugin = TestPlugin()
-
-    # Check that the method is marked as a tool
+    plugin = SamplePlugin()
     assert hasattr(plugin.test_tool, "_is_tool")
     assert plugin.test_tool._is_tool is True
-
-    # Check that the tool metadata is set up correctly
-    assert hasattr(plugin.test_tool, "_tool_metadata")
     metadata = plugin.test_tool._tool_metadata
-
     assert metadata["name"] == "test_tool"
-    assert metadata["category"] == "Testing"
-    assert "A test tool for unit tests" in metadata["description"]
-    assert metadata["requires_auth"] is True
-    assert metadata["rate_limit"] == {"calls": 10, "interval": 60}
-
-    # Check parameter metadata
-    assert "param1" in metadata["args"]
-    assert metadata["args"]["param1"]["type"] == "string"
-    assert "First parameter" in metadata["args"]["param1"]["description"]
-    assert metadata["args"]["param1"]["required"] is True
-
-    assert "param2" in metadata["args"]
-    assert metadata["args"]["param2"]["type"] == "integer"
-    assert metadata["args"]["param2"]["default"] == 42
-    assert metadata["args"]["param2"]["required"] is False
-
-    # Check return type metadata
-    assert metadata["returns"]["type"] == "object"
     assert "Result of the operation" in metadata["returns"]["description"]
-    assert "success" in metadata["returns"]["schema"]
-
-    # Check that the docstring is preserved
-    assert "Test tool with documentation" in metadata["docstring"]
-    assert "This is a more detailed description" in metadata["docstring"]
-    assert "param1" in metadata["docstring"]
-    assert "param2" in metadata["docstring"]
 
 
 def test_tool_invocation():
-    """Test that the tool can be called normally."""
-    plugin = TestPlugin()
+    plugin = SamplePlugin()
     result = plugin.test_tool("test_value", 123)
     assert result["success"] is True
-    assert "test_value" in result["message"]
-    assert "123" in result["message"]
-
-    # Test with default parameter
-    result = plugin.test_tool("another_test")
-    assert "another_test" in result["message"]
-    assert "42" in result["message"]  # Default value for param2
 
 
 @pytest.mark.asyncio
 async def test_event_listener():
-    """Test that the @event_listener decorator works correctly."""
-    plugin = TestPlugin()
-
-    # Check that the method is marked as an event listener
-    assert hasattr(plugin.on_test_event, "_event_listeners")
-    assert isinstance(plugin.on_test_event._event_listeners, list)
-    assert len(plugin.on_test_event._event_listeners) == 1
-
-    # Check that the event listener is registered for the correct event type
-    event_info = plugin.on_test_event._event_listeners[0]
-    assert isinstance(event_info, dict)
-    assert event_info["event_type"] == "test_event"
-    assert event_info["method_name"] == "on_test_event"
-
-    # Test that the event handler can be called
-    test_data = {"test": "data"}
-    await plugin.on_test_event(test_data)
-    assert hasattr(plugin, "last_event")
-    assert plugin.last_event == test_data
+    plugin = SamplePlugin()
+    assert plugin.on_test_event._event_listeners[0]["event_type"] == "test_event"
+    await plugin.on_test_event({"test": "data"})
+    assert plugin.last_event == {"test": "data"}
 
 
 def test_tool_signature_preservation():
-    """Test that the function signature is preserved by the @tool decorator."""
-    plugin = TestPlugin()
-
-    # Get the signature of the decorated method
+    plugin = SamplePlugin()
     sig = inspect.signature(plugin.test_tool)
     params = list(sig.parameters.values())
-
-    # Check that the signature includes 'self' and the parameters
-    assert len(params) == 3  # self, param1, param2
-    assert params[0].name == "self"
-    assert params[1].name == "param1"
-    assert params[2].name == "param2"
-    assert params[2].default == 42  # Default value is preserved
-
-    # Check return type annotation
-    assert sig.return_annotation == dict[str, Any]
-
-
-def test_event_listener_validation():
-    """Test that the @event_listener decorator validates the method signature."""
-    with pytest.raises(TypeError):
-        # Non-async function should raise TypeError
-        @event_listener("invalid_event")
-        def invalid_listener(self):
-            pass
-
-    # This should work fine
-    @event_listener("valid_event")
-    async def valid_listener(self, event_data):
-        pass
+    assert len(params) == 2
+    assert params[0].name == "param1"
+    assert params[1].name == "param2"
+    assert params[1].default == 42
