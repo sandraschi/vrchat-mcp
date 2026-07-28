@@ -14,6 +14,7 @@ import websockets
 
 logger = logging.getLogger(__name__)
 
+
 class PipelineClient:
     def __init__(self, auth_cookie: str = ""):
         self.auth_cookie = auth_cookie

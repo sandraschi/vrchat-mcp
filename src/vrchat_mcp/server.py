@@ -279,11 +279,7 @@ async def manage_economy(operation: str) -> dict[str, Any]:
 
 @app.tool()
 async def manage_input(
-    operation: str,
-    value: Any | None = None,
-    x: float = 0.0,
-    y: float = 0.0,
-    immediate: bool = True
+    operation: str, value: Any | None = None, x: float = 0.0, y: float = 0.0, immediate: bool = True
 ) -> dict[str, Any]:
     """
     Unified Portmanteau for VRChat Input Simulation (OSC only).

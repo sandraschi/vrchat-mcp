@@ -478,8 +478,9 @@ class OSCManager:
             self._connection_timeout_handle = loop.call_later(
                 self.connection_timeout,
                 lambda: self._background_tasks.add(
-                    asyncio.create_task(self._handle_connection_timeout())
-                    .add_done_callback(self._background_tasks.discard)  # type: ignore
+                    asyncio.create_task(self._handle_connection_timeout()).add_done_callback(
+                        self._background_tasks.discard
+                    )  # type: ignore
                 ),
             )
 

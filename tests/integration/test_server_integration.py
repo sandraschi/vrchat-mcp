@@ -55,9 +55,10 @@ class TestServerIntegration:
         try:
             # Start server in FastAPI mode
             import shutil
+
             cmd = [sys.executable, "-m", "vrchat_mcp.cli", "--mode", "fastapi", "--host", "127.0.0.1", "--port", "8999"]
             cmd[0] = shutil.which(cmd[0]) or cmd[0]
-            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)  # noqa: S603
+            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
             # Wait for server to start
             server_ready = await self.wait_for_server_ready("http://127.0.0.1:8999", timeout=15.0)
@@ -101,9 +102,10 @@ class TestServerIntegration:
         try:
             # Start server
             import shutil
+
             cmd = [sys.executable, "-m", "vrchat_mcp.cli", "--mode", "fastapi", "--host", "127.0.0.1", "--port", "9000"]
             cmd[0] = shutil.which(cmd[0]) or cmd[0]
-            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)  # noqa: S603
+            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
             # Wait for server to start
             server_ready = await self.wait_for_server_ready("http://127.0.0.1:9000", timeout=15.0)
@@ -165,9 +167,10 @@ class TestServerIntegration:
         try:
             # Start server
             import shutil
+
             cmd = [sys.executable, "-m", "vrchat_mcp.cli", "--mode", "fastapi", "--host", "127.0.0.1", "--port", "9001"]
             cmd[0] = shutil.which(cmd[0]) or cmd[0]
-            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)  # noqa: S603
+            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
             # Wait for server to start
             server_ready = await self.wait_for_server_ready("http://127.0.0.1:9001", timeout=15.0)
@@ -222,9 +225,10 @@ class TestServerIntegration:
         try:
             # Start server
             import shutil
+
             cmd = [sys.executable, "-m", "vrchat_mcp.cli", "--mode", "fastapi", "--host", "127.0.0.1", "--port", "9002"]
             cmd[0] = shutil.which(cmd[0]) or cmd[0]
-            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)  # noqa: S603
+            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
             # Wait for server to start
             server_ready = await self.wait_for_server_ready("http://127.0.0.1:9002", timeout=15.0)
@@ -263,9 +267,10 @@ class TestServerIntegration:
         try:
             # Start server
             import shutil
+
             cmd = [sys.executable, "-m", "vrchat_mcp.cli", "--mode", "fastapi", "--host", "127.0.0.1", "--port", "9003"]
             cmd[0] = shutil.which(cmd[0]) or cmd[0]
-            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)  # noqa: S603
+            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
             # Wait for server to start
             server_ready = await self.wait_for_server_ready("http://127.0.0.1:9003", timeout=15.0)
@@ -302,9 +307,10 @@ class TestServerIntegration:
         try:
             # Start server
             import shutil
+
             cmd = [sys.executable, "-m", "vrchat_mcp.cli", "--mode", "fastapi", "--host", "127.0.0.1", "--port", "9004"]
             cmd[0] = shutil.which(cmd[0]) or cmd[0]
-            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)  # noqa: S603
+            server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
             # Wait for server to start
             server_ready = await self.wait_for_server_ready("http://127.0.0.1:9004", timeout=15.0)

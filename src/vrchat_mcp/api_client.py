@@ -17,6 +17,7 @@ from vrchatapi.models.two_factor_email_code import TwoFactorEmailCode
 
 logger = logging.getLogger(__name__)
 
+
 class VRChatAPIClient:
     def __init__(self, username: str = "", password: str = ""):
         self.username = username
@@ -36,7 +37,7 @@ class VRChatAPIClient:
         # State
         self.current_user = None
         self.needs_2fa = False
-        self.two_factor_type = None # "email" or "totp"
+        self.two_factor_type = None  # "email" or "totp"
 
         # Cache (60s TTL as per VRChat policy)
         self.world_cache = TTLCache(maxsize=100, ttl=60)

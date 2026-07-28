@@ -44,12 +44,11 @@ class FastAPITester:
 
         # Resolve command path for S603/S607 compliance
         import shutil
+
         cmd = list(self.server_command)
         cmd[0] = shutil.which(cmd[0]) or cmd[0]
 
-        self.server_process = subprocess.Popen(  # noqa: S603
-            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-        )
+        self.server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
         # Wait for server to start (check health endpoint)
         max_attempts = 30

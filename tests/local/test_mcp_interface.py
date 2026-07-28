@@ -33,10 +33,11 @@ class MCPTester:
 
         # Resolve command path for S603/S607 compliance
         import shutil
+
         cmd = list(self.server_command)
         cmd[0] = shutil.which(cmd[0]) or cmd[0]
 
-        self.server_process = subprocess.Popen(  # noqa: S603
+        self.server_process = subprocess.Popen(
             cmd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,

@@ -13,7 +13,7 @@ import pytest
 src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-from vrchat_mcp.plugins.example_plugin import ExamplePlugin  # noqa: E402
+from vrchat_mcp.plugins.example_plugin import ExamplePlugin
 
 
 @pytest.fixture(scope="session")

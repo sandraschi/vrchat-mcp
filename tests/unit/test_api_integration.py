@@ -25,6 +25,7 @@ async def test_manage_input_chatbox():
         assert msg.address == "/chatbox/input"
         assert msg.args == ["Test Message", True]
 
+
 @pytest.mark.asyncio
 async def test_manage_input_jump():
     with patch("vrchat_mcp.server.osc_manager") as mock_osc:
@@ -36,6 +37,7 @@ async def test_manage_input_jump():
         # Jump sends two messages (Press and Release)
         assert mock_osc.send_message.call_count == 2
 
+
 @pytest.mark.asyncio
 async def test_manage_world_unauthorized():
     # If API not initialized, should raise RuntimeError in result
@@ -43,6 +45,7 @@ async def test_manage_world_unauthorized():
         result = await manage_world(operation="get_info", world_id="wrld_123")
         assert "error" in result
         assert "REST API Client not initialized" in result["error"]
+
 
 @pytest.mark.asyncio
 async def test_manage_world_info():
@@ -53,6 +56,7 @@ async def test_manage_world_info():
         result = await manage_world(operation="get_info", world_id="wrld_123")
         assert result["data"]["name"] == "Trial World"
         mock_api.get_world_info.assert_called_once_with("wrld_123")
+
 
 @pytest.mark.asyncio
 async def test_manage_economy_balance():

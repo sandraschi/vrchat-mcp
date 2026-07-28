@@ -67,7 +67,7 @@ class APIManager:
         return await asyncio.to_thread(self._compute_md5_sync, file_path)
 
     def _compute_md5_sync(self, file_path: str) -> str:
-        hash_md5 = hashlib.md5()  # noqa: S324 (Required by VRChat API for Content-MD5)
+        hash_md5 = hashlib.md5()
         with open(file_path, "rb") as f:
             for chunk in iter(lambda: f.read(4096), b""):
                 hash_md5.update(chunk)
