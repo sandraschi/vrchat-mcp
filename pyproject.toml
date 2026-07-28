@@ -1,4 +1,4 @@
-[build-system]
+﻿[build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
@@ -7,13 +7,13 @@ name = "vrchat-mcp"
 version = "14.1.0"
 description = "VRChat MCP for controlling avatars and assets with FastMCP 3.2.0 (SOTA Industrialized)"
 authors = [
-    {name = "Sandra Schi"}
+    {name = "Sandra Schipal"}
 ]
 license = {text = "MIT"}
 requires-python = ">=3.12"
 dependencies = [
     "aiohttp>=3.9.0",
-    "fastmcp>=3.2.0,<4",
+    "fastmcp>=3.4.4,<4",
     "numpy>=1.24.0",
     "python-osc>=1.8.1",
     "pydantic>=2.0.0",
@@ -31,6 +31,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "pre-commit>=4.6.1",
     "pytest>=7.0.0",
     "pytest-asyncio>=0.21.0",
     "pytest-cov>=4.0.0",
@@ -60,3 +61,4 @@ ignore = ["S101", "B008"]
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
