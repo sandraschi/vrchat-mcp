@@ -1,0 +1,47 @@
+{
+	"$schema": "https://schema.tauri.app/config/2",
+	"productName": "VRChat MCP",
+	"version": "0.1.0",
+	"identifier": "com.sandraschi.vrchat-mcp",
+	"build": {
+		"frontendDist": "../web_sota/dist"
+	},
+	"app": {
+		"windows": [
+			{
+				"label": "main",
+				"title": "VRChat MCP Operator",
+				"width": 1280,
+				"height": 860,
+				"resizable": true
+			}
+		],
+		"security": {
+			"csp": "default-src 'self'; connect-src 'self' http://127.0.0.1:10712 ipc: http://ipc.localhost; img-src 'self' data: http://127.0.0.1:10712; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'"
+		}
+	},
+	"bundle": {
+		"active": true,
+		"targets": ["nsis"],
+		"icon": ["icons/icon.png", "icons/icon.ico"],
+		"resources": [
+			"resources/vrchat-mcp-backend.exe",
+            "resources/.env.example",
+			],
+		"windows": {
+			"webviewInstallMode": {
+				"type": "skip"
+			},
+			"nsis": { "installerHooks": "./windows/hooks.nsh",
+				"installMode": "currentUser"}
+		}
+	},
+	"plugins": {}
+}
+
+
+
+
+
+
+
