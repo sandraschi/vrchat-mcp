@@ -17,12 +17,10 @@ export function Avatars() {
   const [paramValue, setParamValue] = useState("0.5");
 
   const handleLoadAvatar = () => {
-    console.log(`Loading avatar: ${avatarId}`);
     // TODO: Call MCP Tool
   };
 
   const handleSetParameter = () => {
-    console.log(`Setting parameter ${paramName} to ${paramValue}`);
     // TODO: Call MCP Tool
   };
 
