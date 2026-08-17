@@ -1,0 +1,14 @@
+{
+  "product_name": "VRChat MCP",
+  "install_dir": "%LOCALAPPDATA%\\VRChat MCP",
+  "operator_exe": "vrchat-mcp-operator.exe",
+  "backend_process_names": ["vrchat-mcp-operator", "vrchat-mcp-backend"],
+  "backend_port": 10712,
+  "health_path": "/health",
+  "diagnostics_path": "/api/v1/diagnostics",
+  "feature_smoke_path": "/api/v1/status",
+  "window_title_re": "VRChat MCP",
+  "nsis_glob": "native/target/release/bundle/nsis/VRChat MCP_*_x64-setup.exe",
+  "bridge_ok_text": "API reachable",
+  "uninstall_registry_filter": "*VRChat MCP*"
+}
