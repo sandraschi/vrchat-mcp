@@ -263,7 +263,100 @@ async def manage_economy(operation: str) -> dict[str, Any]:
         if operation == "balance":
             result["data"] = await vrchat_api.get_economy_info()
         elif operation == "products":
-            result["data"] = {"products": [], "subscriptions": []}  # Placeholder
+            result["data"] = await vrchat_api.get_products_and_subscriptions()
+        else:
+            result["error"] = f"Unknown operation: {operation}"
+            return result
+
+        success = True
+        return result
+    except Exception as e:
+        result["error"] = str(e)
+        return result
+    finally:
+        await telemetry.record(time.time() - start_time, success)
+
+
+@app.tool()
+async def manage_social(
+    operation: str,
+    user_id: str | None = None,
+    username: str | None = None,
+    query: str | None = None,
+    notification_id: str | None = None,
+    notif_type: str | None = None,
+    offline: bool = False,
+    limit: int = 20,
+) -> dict[str, Any]:
+    """
+    Unified Portmanteau for Friends, Users, and Notifications (REST API REQUIRED).
+
+    Added 2026-09-03 - vrchat-mcp previously only wired up 3 of vrchatapi's 18 available API
+    classes (auth, worlds, economy); this is the friends/users/notifications slice.
+    groups/instances/avatars/inventory/etc. remain unwired - see CHANGELOG.
+
+    Operations:
+    - list_friends: List friends (offline=True for offline friends instead of online/active).
+    - friend_status: Check friendship/request status with a specific user_id.
+    - send_friend_request: Send a friend request to user_id.
+    - accept_friend_request: Accept a pending request via notification_id.
+    - unfriend: Remove user_id as a friend. DESTRUCTIVE.
+    - get_user: Fetch a user's public profile by user_id.
+    - get_user_by_name: Fetch a user's public profile by username.
+    - search_users: Search users by query string.
+    - notifications: List recent account notifications via REST (a point-in-time snapshot,
+      not the live feed - see recent_events for that).
+    - recent_events: Read from the Pipeline websocket's in-memory event buffer (last 50
+      received events regardless of whether a handler was registered for them). Requires the
+      Pipeline to be connected (started automatically after 2FA in manage_system/auth_2fa).
+    """
+    start_time = time.time()
+    success = False
+    result = {"operation": operation}
+
+    try:
+        if operation == "recent_events":
+            if not pipeline:
+                raise RuntimeError("Pipeline not connected. Complete login (and 2FA if required) first.")
+            result["data"] = pipeline.get_recent_events(event_type=notif_type, limit=limit)
+            success = True
+            return result
+
+        if not vrchat_api:
+            raise RuntimeError("REST API Client not initialized. Set secrets first.")
+
+        if operation == "list_friends":
+            result["data"] = await vrchat_api.get_friends(offline=offline)
+        elif operation == "friend_status":
+            if not user_id:
+                raise ValueError("user_id required for friend_status")
+            result["data"] = await vrchat_api.get_friend_status(user_id)
+        elif operation == "send_friend_request":
+            if not user_id:
+                raise ValueError("user_id required for send_friend_request")
+            result["data"] = await vrchat_api.send_friend_request(user_id)
+        elif operation == "accept_friend_request":
+            if not notification_id:
+                raise ValueError("notification_id required for accept_friend_request")
+            result["data"] = await vrchat_api.accept_friend_request(notification_id)
+        elif operation == "unfriend":
+            if not user_id:
+                raise ValueError("user_id required for unfriend")
+            result["data"] = await vrchat_api.unfriend(user_id)
+        elif operation == "get_user":
+            if not user_id:
+                raise ValueError("user_id required for get_user")
+            result["data"] = await vrchat_api.get_user(user_id)
+        elif operation == "get_user_by_name":
+            if not username:
+                raise ValueError("username required for get_user_by_name")
+            result["data"] = await vrchat_api.get_user_by_name(username)
+        elif operation == "search_users":
+            if not query:
+                raise ValueError("query required for search_users")
+            result["data"] = await vrchat_api.search_users(query, limit=limit)
+        elif operation == "notifications":
+            result["data"] = await vrchat_api.get_notifications(notif_type)
         else:
             result["error"] = f"Unknown operation: {operation}"
             return result
