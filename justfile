@@ -57,10 +57,14 @@ audit-deps:
     uv run safety check
 # --- Distribution ---
 
-# Build and pack the industrialized .mcpb bundle
+# Pack the industrialized .mcpb bundle
+# `mcpb build` was never a real subcommand (mcpb --help: init/validate/clean/pack/unpack/
+# sign/verify/info/unsign) - removed 2026-09-03. It silently failed every run
+# ("error: unknown command 'build'") and `pack` ran anyway on the unbuilt tree, which is how
+# the .mcpbignore gaps went unnoticed long enough to ship a 47.6MB bundle including
+# web_sota/node_modules/.
 pack:
     Set-Location '{{justfile_directory()}}'
-    npx mcpb build
     npx mcpb pack . dist/vrchat-mcp.mcpb
 
 
