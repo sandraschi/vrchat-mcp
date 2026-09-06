@@ -36,8 +36,7 @@ fix:
 up:
     Set-Location '{{justfile_directory()}}'
     Start-Process pwsh -ArgumentList "-NoExit -Command `"uv run python -m vrchat_mcp.server`""
-    Set-Location 'web_sota'
-    npm run dev
+    Set-Location 'web_sota'; npm run dev
 
 # Launch the VRChat Control Plane (Backend only)
 server:
