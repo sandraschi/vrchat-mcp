@@ -75,9 +75,7 @@ class PipelineClient:
                 data = json.loads(message)
                 event_type = data.get("type")
 
-                self.recent_events.append(
-                    {"type": event_type, "received_at": datetime.now(UTC).isoformat(), **data}
-                )
+                self.recent_events.append({"type": event_type, "received_at": datetime.now(UTC).isoformat(), **data})
 
                 if event_type in self.handlers:
                     for handler in self.handlers[event_type]:

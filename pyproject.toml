@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "vrchat-mcp"
-version = "14.1.0"
+version = "14.1.1"
 description = "VRChat MCP for controlling avatars and assets with FastMCP 3.2.0 (SOTA Industrialized)"
 authors = [
     {name = "Sandra Schipal"}
