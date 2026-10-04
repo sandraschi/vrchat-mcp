@@ -8,6 +8,7 @@ logging and OSC settings for development.
 
 import asyncio
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -17,11 +18,15 @@ sys.path.insert(0, str(project_root))
 
 from vrchat_mcp import VRChatMCP  # noqa: E402
 
+# Absolute log path: a bare filename lands in the host's cwd (BUG-063)
+LOG_DIR = Path(os.environ.get("LOCALAPPDATA") or Path.home()) / "vrchat-mcp" / "logs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler(), logging.FileHandler("vrchat_mcp_debug.log")],
+    handlers=[logging.StreamHandler(), logging.FileHandler(LOG_DIR / "vrchat_mcp_debug.log")],
 )
 
 # Configuration
