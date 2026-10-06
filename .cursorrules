@@ -61,3 +61,10 @@
 
 **When in doubt:** Read the central README and navigate from there.
 
+## Session Context (vrchat-mcp)
+Before starting work: read `src/vrchat_mcp/tools/` (avatar/osc/npc portmanteau
+tools) + `fleet-start.config.ps1` (ports; backend entry `python -m
+vrchat_mcp.server`). The debug UI lives in `src/vrchat_mcp/web/` (plain JS,
+Biome-linted). At end of work: run `just lint` + `just test`, never commit
+`*.bak*`, `__pycache__/`, or `reports/`.
+
