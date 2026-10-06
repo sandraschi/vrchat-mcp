@@ -33,19 +33,36 @@ up:
 
 # Launch the VRChat Control Plane (Backend only)
 server:
-    Set-Location '{{justfile_directory()}}'
     uv run python -m vrchat_mcp.server
+
+# Serve alias (fleet contract name for the backend entry above)
+serve:
+    uv run python -m vrchat_mcp.server
+
+# Format Python (ruff format) — pairs with lint
+fmt:
+    uv run ruff format .
+
+# Local five-gate CI: ruff + format-check + pytest + tsc + biome + pyright
+ci:
+    uv run ruff check src/ tests/
+    uv run ruff format src/ tests/ --check
+    uv run pytest tests/ -q -p no:cacheprovider
+    uv run python -m pyright src/
+    Set-Location '{{justfile_directory()}}\web_sota'; npx tsc --noEmit; npx @biomejs/biome ci src
+
+# Playwright e2e (needs backend + frontend up)
+e2e:
+    Set-Location '{{justfile_directory()}}\web_sota'; npx playwright test
 
 # --- Hardening ---
 
 # Execute Bandit industrial security audit
 check-sec:
-    Set-Location '{{justfile_directory()}}'
     uv run bandit -r src/
 
 # Execute industrialized dependency audit
 audit-deps:
-    Set-Location '{{justfile_directory()}}'
     uv run safety check
 # --- Distribution ---
 

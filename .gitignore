@@ -19,3 +19,8 @@ __pycache__/
 dist/
 build/
 
+# Batch backup safety + regenerable assess snapshots (never commit)
+*.bak
+*.bak.*
+reports/
+
