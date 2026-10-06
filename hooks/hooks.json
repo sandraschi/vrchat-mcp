@@ -1,0 +1,1 @@
+{"hooks": {"SessionStart": [{"hooks": [{"text": "## vrchat-mcp\nAvatar/osc/npc portmanteau tools drive VRChat over OSC. Backend: python -m vrchat_mcp.server. Before work: check VRChat running with OSC enabled. After work: just lint + just test; never commit *.bak* or __pycache__/.", "type": "text"}]}]}}
