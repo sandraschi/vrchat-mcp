@@ -1,0 +1,15 @@
+﻿# Per-repo fleet start config for vrchat-mcp
+# Edit ports/backend target here - start.ps1 is fleet-standard.
+@{
+    Name         = 'vrchat-mcp'
+    BackendPort  = 10712
+    FrontendPort = 0
+    HealthPath   = '/health'
+    WebRoot      = 'web_sota'
+    Backend = @{
+        Kind = 'none'
+    }
+    Frontend = @{
+        Kind = 'none'
+    }
+}

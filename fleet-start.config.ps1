@@ -1,15 +1,19 @@
 ﻿# Per-repo fleet start config for vrchat-mcp
-# Edit ports/backend target here - start.ps1 is fleet-standard.
 @{
     Name         = 'vrchat-mcp'
-    BackendPort  = 0
-    FrontendPort = 0
+    BackendPort  = 10712
+    FrontendPort = 11252
     HealthPath   = '/health'
     WebRoot      = 'web_sota'
     Backend = @{
-        Kind = 'none'
+        Kind          = 'uvicorn'
+        UvicornTarget = 'web_sota.backend.server:app'
+        Env           = @{ WEB_PORT = '10712' }
     }
     Frontend = @{
-        Kind = 'none'
+        Kind           = 'vite-npm'
+        PackageManager = 'npm'
+        PortEnvVar     = 'VITE_PORT'
+        ApiTargetEnv   = 'VITE_API_TARGET'
     }
 }
