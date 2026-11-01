@@ -7,16 +7,17 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { API_BASE } from "../lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function Status() {
   const [status, setStatus] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [_loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:10795/api/v1/manage_system", {
+        const res = await fetch(`${API_BASE}/api/v1/manage_system`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ operation: "status" }),
@@ -168,7 +169,7 @@ export function Status() {
             </div>
             <div className="flex justify-between items-center text-sm border-t border-slate-800 pt-4">
               <span className="text-slate-400">SOTA API Port</span>
-              <span className="text-blue-400 font-mono">10795</span>
+                <span className="text-blue-400 font-mono">10712</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-slate-400">REST Endpoint</span>

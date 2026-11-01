@@ -1,5 +1,6 @@
 import { Bot, Zap } from "lucide-react";
 import { useState } from "react";
+import { API_BASE } from "../lib/api";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,13 +16,34 @@ export function Avatars() {
   const [avatarId, setAvatarId] = useState("");
   const [paramName, setParamName] = useState("Voice");
   const [paramValue, setParamValue] = useState("0.5");
+  const [notice, setNotice] = useState("");
 
-  const handleLoadAvatar = () => {
-    // TODO: Call MCP Tool
+  const handleLoadAvatar = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/v1/manage_avatar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ operation: "load", avatar_id: avatarId }),
+      });
+      const d = await r.json();
+      setNotice(d.success ? `Loaded ${avatarId}` : (d.error || "Load failed"));
+    } catch {
+      setNotice("Load failed. Is the backend running?");
+    }
   };
 
-  const handleSetParameter = () => {
-    // TODO: Call MCP Tool
+  const handleSetParameter = async () => {
+    try {
+      const r = await fetch(`${API_BASE}/api/v1/manage_avatar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ operation: "set_param", parameter: paramName, value: paramValue }),
+      });
+      const d = await r.json();
+      setNotice(d.success ? `Set ${paramName}=${paramValue}` : (d.error || "Send failed"));
+    } catch {
+      setNotice("Send failed. Is the backend running?");
+    }
   };
 
   return (
@@ -34,6 +56,8 @@ export function Avatars() {
           Manage your VRChat avatar and parameters.
         </p>
       </div>
+
+      {notice && <p className="text-xs text-slate-400">{notice}</p>}
 
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="bg-slate-900/50 border-slate-800">

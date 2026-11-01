@@ -1,14 +1,15 @@
 import { Terminal } from "lucide-react";
 import { useEffect, useState } from "react";
+import { API_BASE } from "../lib/api";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function Tools() {
   const [tools, setTools] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("http://localhost:10795/api/v1/tools/")
+    fetch(`${API_BASE}/api/v1/tools/`)
       .then((res) => res.json())
-      .then(setTools)
+      .then((d) => setTools(Array.isArray(d) ? d : []))
       .catch(console.error);
   }, []);
 
@@ -23,6 +24,9 @@ export function Tools() {
                 <Terminal className="h-4 w-4 text-emerald-500" />
                 {t.name}
               </CardTitle>
+              {t.description && (
+                <p className="text-xs text-slate-400">{t.description}</p>
+              )}
             </CardHeader>
           </Card>
         ))}

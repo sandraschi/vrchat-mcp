@@ -1,5 +1,6 @@
 import { Radio, Send } from "lucide-react";
 import { useState } from "react";
+import { API_BASE } from "../lib/api";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,9 +21,18 @@ export function OSC() {
     "[12:00:02] Listening on 127.0.0.1:9001",
   ]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     const timestamp = new Date().toLocaleTimeString();
-    setLogs((prev) => [`[${timestamp}] Sent ${address}: ${value}`, ...prev]);
+    try {
+      await fetch(`${API_BASE}/api/v1/manage_osc`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ operation: "send", address, args: [value] }),
+      });
+      setLogs((prev) => [`[${timestamp}] Sent ${address}: ${value}`, ...prev]);
+    } catch {
+      setLogs((prev) => [`[${timestamp}] Send failed (backend offline): ${address}`, ...prev]);
+    }
     setValue("");
   };
 

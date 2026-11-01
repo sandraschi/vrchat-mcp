@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { API_BASE } from "../lib/api";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,14 +17,26 @@ function LLMSettings() {
   >({});
   const [selectedProvider, setSelectedProvider] = useState("ollama");
   const [selectedModel, setSelectedModel] = useState("");
-  const [status, setStatus] = useState<"loading" | "ready" | "error">(
+  const [_status, setStatus] = useState<"loading" | "ready" | "error">(
     "loading",
   );
   useEffect(() => {
-    fetch("/api/llm/providers")
+    fetch(`${API_BASE}/api/llm/providers`)
       .then((r) => r.json())
       .then((d) => {
-        setProviders(d);
+        // Backend returns { providers: [{ id, models: string[] }] }.
+        // Normalize to Record<string, { name: string }[]> for the selects below.
+        const rawProviders = d.providers || d;
+        const normalized: Record<string, { name: string }[]> = {};
+        if (Array.isArray(rawProviders)) {
+          for (const p of rawProviders) {
+            const key = p.id === "lmstudio" ? "lm_studio" : p.id;
+            normalized[key] = (p.models || []).map((m: string) => ({ name: m }));
+          }
+        } else {
+          Object.assign(normalized, rawProviders);
+        }
+        setProviders(normalized);
         const savedP = localStorage.getItem("llm_provider") || "ollama";
         const savedM = localStorage.getItem("llm_model") || "";
         setSelectedProvider(savedP);

@@ -1,5 +1,6 @@
 import { Activity, MessageSquare, Wifi, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
+import { API_BASE } from "../lib/api";
 import {
   Card,
   CardContent,
@@ -17,8 +18,7 @@ export function Dashboard() {
     const fetchData = async () => {
       try {
         // Fetch System Status
-        const statusRes = await fetch(
-          "http://127.0.0.1:10795/api/v1/manage_system",
+        const statusRes = await fetch(`${API_BASE}/api/v1/manage_system`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -29,7 +29,7 @@ export function Dashboard() {
         setStatus(statusData.data);
 
         // Fetch OSC Stats
-        const oscRes = await fetch("http://127.0.0.1:10795/api/v1/manage_osc", {
+        const oscRes = await fetch(`${API_BASE}/api/v1/manage_osc`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ operation: "stats" }),
@@ -39,7 +39,7 @@ export function Dashboard() {
 
         // Fetch Metrics
         const metricsRes = await fetch(
-          "http://127.0.0.1:10795/api/v1/manage_system",
+          `${API_BASE}/api/v1/manage_system`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -83,7 +83,7 @@ export function Dashboard() {
             <div className="text-2xl font-bold text-white capitalize">
               {status?.status || "Connecting..."}
             </div>
-            <p className="text-xs text-slate-400">Port: 10795 (REST/OSC)</p>
+            <p className="text-xs text-slate-400">Port: 10712 (REST) / OSC 9000+9001</p>
           </CardContent>
         </Card>
         <Card className="bg-slate-900/50 border-slate-800">
