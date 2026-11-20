@@ -44,7 +44,19 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="vrchat-mcp", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:11252",
+        "http://localhost:11252",
+        "tauri://localhost",
+        "http://tauri.localhost",
+        "https://tauri.localhost",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
@@ -71,18 +83,50 @@ async def llm_providers():
             if resp.status_code == 200:
                 data = resp.json()
                 models = [m["name"] for m in data.get("models", [])]
-                providers.append({"id": "ollama", "label": "Ollama", "base_url": "http://127.0.0.1:11434/v1", "models": models, "needs_key": False})
+                providers.append(
+                    {
+                        "id": "ollama",
+                        "label": "Ollama",
+                        "base_url": "http://127.0.0.1:11434/v1",
+                        "models": models,
+                        "needs_key": False,
+                    }
+                )
     except Exception:
-        providers.append({"id": "ollama", "label": "Ollama", "base_url": "http://127.0.0.1:11434/v1", "models": [], "needs_key": False})
+        providers.append(
+            {
+                "id": "ollama",
+                "label": "Ollama",
+                "base_url": "http://127.0.0.1:11434/v1",
+                "models": [],
+                "needs_key": False,
+            }
+        )
     try:
         async with httpx.AsyncClient(timeout=3.0) as client:
             resp = await client.get("http://127.0.0.1:1234/v1/models")
             if resp.status_code == 200:
                 data = resp.json()
                 models = [m["id"] for m in data.get("data", [])]
-                providers.append({"id": "lmstudio", "label": "LM Studio", "base_url": "http://127.0.0.1:1234/v1", "models": models, "needs_key": False})
+                providers.append(
+                    {
+                        "id": "lmstudio",
+                        "label": "LM Studio",
+                        "base_url": "http://127.0.0.1:1234/v1",
+                        "models": models,
+                        "needs_key": False,
+                    }
+                )
     except Exception:
-        providers.append({"id": "lmstudio", "label": "LM Studio", "base_url": "http://127.0.0.1:1234/v1", "models": [], "needs_key": False})
+        providers.append(
+            {
+                "id": "lmstudio",
+                "label": "LM Studio",
+                "base_url": "http://127.0.0.1:1234/v1",
+                "models": [],
+                "needs_key": False,
+            }
+        )
     return {"providers": providers}
 
 
@@ -94,10 +138,13 @@ async def llm_chat(body: dict):
     base = "http://127.0.0.1:1234/v1" if provider == "lmstudio" else "http://127.0.0.1:11434/v1"
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
-            resp = await client.post(f"{base}/chat/completions", json={
-                "model": model,
-                "messages": [{"role": "user", "content": prompt}],
-            })
+            resp = await client.post(
+                f"{base}/chat/completions",
+                json={
+                    "model": model,
+                    "messages": [{"role": "user", "content": prompt}],
+                },
+            )
             if resp.status_code == 200:
                 data = resp.json()
                 return {"response": data["choices"][0]["message"]["content"]}
@@ -113,26 +160,30 @@ async def llm_chat(body: dict):
 async def manage_system(body: dict):
     operation = (body or {}).get("operation", "status")
     if operation == "status":
-        return {"data": {
-            "server": "vrchat-mcp",
-            "version": "14.1.0",
-            "status": "running",
-            "components": {
-                "osc": True,
-                "avatar": True,
-                "inspector": True,
-                "rest_api": False,
-                "pipeline": False,
-            },
-        }}
+        return {
+            "data": {
+                "server": "vrchat-mcp",
+                "version": "14.1.0",
+                "status": "running",
+                "components": {
+                    "osc": True,
+                    "avatar": True,
+                    "inspector": True,
+                    "rest_api": False,
+                    "pipeline": False,
+                },
+            }
+        }
     if operation == "metrics":
         uptime = time.time() - _START_TIME
-        return {"data": {
-            "uptime_seconds": round(uptime, 1),
-            "throughput_rps": 0.0,
-            "error_rate": 0.0,
-            "avg_response_ms": 0.0,
-        }}
+        return {
+            "data": {
+                "uptime_seconds": round(uptime, 1),
+                "throughput_rps": 0.0,
+                "error_rate": 0.0,
+                "avg_response_ms": 0.0,
+            }
+        }
     return JSONResponse(status_code=400, content={"error": f"Unknown operation: {operation}"})
 
 
@@ -225,7 +276,7 @@ async def get_logs(
     if sort == "desc":
         entries = entries[::-1]
     total = len(entries)
-    return {"entries": entries[offset:offset + limit], "total": total}
+    return {"entries": entries[offset : offset + limit], "total": total}
 
 
 @app.get("/api/logs/export")
@@ -248,4 +299,5 @@ async def clear_logs():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="127.0.0.1", port=8000)
